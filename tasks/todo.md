@@ -40,9 +40,9 @@
 ### 1.7 Deployment
 - [x] Initialize git repo
 - [x] Push to GitHub (github.com/mitchbloch/routesmith, private)
-- [ ] Deploy to Vercel (connect via dashboard, same as platemate)
-- [ ] Configure env vars in Vercel dashboard (MAPBOX_TOKEN, SUPABASE_URL, SUPABASE_ANON_KEY)
-- [ ] Verify live URL works
+- [x] Deploy to Vercel (https://routesmith-lime.vercel.app)
+- [x] Configure env vars in Vercel dashboard (MAPBOX_TOKEN, SUPABASE_URL, SUPABASE_ANON_KEY)
+- [ ] Verify live URL works end-to-end
 
 ### 1.8 End-to-End Verification
 - [x] `npm run build` passes clean

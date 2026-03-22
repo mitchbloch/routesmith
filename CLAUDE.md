@@ -76,11 +76,12 @@ RLS: `auth.uid() = user_id` on user-owned tables. Auto-discovered corridors read
 
 - **Build**: `npm run build` passes clean. `npm run lint` has 5 pre-existing `set-state-in-effect` warnings (non-blocking).
 - **GitHub**: github.com/mitchbloch/routesmith (private)
+- **Vercel**: https://routesmith-lime.vercel.app (auto-deploys on push to main)
 - **MVP**: All 8 phases complete (landing → wizard → generation → results → detail → save/share/library)
 - **Quick Wins**: Done — loading skeletons, error boundaries, mobile responsive polish
 - **Stretch Goals**: Done — SSR OpenGraph meta, PWA manifest, reverse geocoder, P2P destination picker, real elevation via Tilequery
 - **Algorithm Improvements**: Done — hard distance filter, 12 candidates (3 targets × 4 bearings), waypoint radius calibration, `continue_straight=true`, trail/path snapping, geocoder proximity bias, results caching, rounded scores
-- **Infrastructure (Phase 1)**: In progress — Supabase backend, auth, DAL, API routes done. Vercel deployment pending.
+- **Infrastructure (Phase 1)**: In progress — Supabase backend, auth, DAL, API routes, Vercel deployment done. E2E verification remaining.
 
 ## Refactor Plan (4 Phases)
 
