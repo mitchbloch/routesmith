@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --color-primary: #3b82f6;
+  --color-primary-dark: #2563eb;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
+.mapboxgl-ctrl-geocoder {
+  width: 100% !important;
+  max-width: 100% !important;
+  font-family: inherit !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important;
+  border-radius: 0.75rem !important;
+}
+
+.mapboxgl-ctrl-geocoder--input {
+  height: 48px !important;
+  font-size: 16px !important;
+  padding: 6px 45px !important;
+}
