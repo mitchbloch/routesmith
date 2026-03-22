@@ -38,9 +38,9 @@
 - [ ] Update `src/app/library/page.tsx` (currently works via hook, may want server-side fetch later)
 
 ### 1.7 Deployment
-- [ ] Initialize git repo
-- [ ] Push to GitHub
-- [ ] Deploy to Vercel
+- [x] Initialize git repo
+- [x] Push to GitHub (github.com/mitchbloch/routesmith, private)
+- [ ] Deploy to Vercel (connect via dashboard, same as platemate)
 - [ ] Configure env vars in Vercel dashboard (MAPBOX_TOKEN, SUPABASE_URL, SUPABASE_ANON_KEY)
 - [ ] Verify live URL works
 
