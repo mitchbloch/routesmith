@@ -39,9 +39,11 @@
 
 ### 1.7 Deployment
 - [x] Initialize git repo
-- [x] Push to GitHub (github.com/mitchbloch/routesmith, private)
+- [x] Push to GitHub (github.com/mitchbloch/routesmith, public)
 - [x] Deploy to Vercel (https://routesmith-lime.vercel.app)
 - [x] Configure env vars in Vercel dashboard (MAPBOX_TOKEN, SUPABASE_URL, SUPABASE_ANON_KEY)
+- [x] Fix git committer email (`mrbloch@MacBook-Air.local` → `mbloch98@gmail.com`) — was blocking Vercel deploys
+- [x] Make repo public + add MIT license
 - [ ] Verify live URL works end-to-end
 
 ### 1.8 End-to-End Verification

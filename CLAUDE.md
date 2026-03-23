@@ -75,7 +75,7 @@ RLS: `auth.uid() = user_id` on user-owned tables. Auto-discovered corridors read
 ## Current State
 
 - **Build**: `npm run build` passes clean. `npm run lint` has 5 pre-existing `set-state-in-effect` warnings (non-blocking).
-- **GitHub**: github.com/mitchbloch/routesmith (private)
+- **GitHub**: github.com/mitchbloch/routesmith (public, MIT license)
 - **Vercel**: https://routesmith-lime.vercel.app (auto-deploys on push to main)
 - **MVP**: All 8 phases complete (landing → wizard → generation → results → detail → save/share/library)
 - **Quick Wins**: Done — loading skeletons, error boundaries, mobile responsive polish
