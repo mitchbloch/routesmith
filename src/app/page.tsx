@@ -5,12 +5,14 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Nav from '@/components/Nav';
 import { reverseGeocode } from '@/lib/geocoding';
+import { useGeolocation } from '@/hooks/useGeolocation';
 
 const Map = dynamic(() => import('@/components/Map'), { ssr: false });
 const AddressSearch = dynamic(() => import('@/components/AddressSearch'), { ssr: false });
 
 export default function Home() {
   const router = useRouter();
+  const geo = useGeolocation();
   const [location, setLocation] = useState<{ lat: number; lng: number; address?: string } | null>(null);
   const [marker, setMarker] = useState<[number, number] | null>(null);
 
@@ -33,11 +35,33 @@ export default function Home() {
     router.push('/wizard');
   };
 
+  // Show loading state while geolocation resolves
+  if (geo.loading) {
+    return (
+      <div className="h-screen w-screen relative">
+        <Nav />
+        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
+            <p className="text-gray-600 font-medium">Finding your location...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const mapCenter: [number, number] = geo.location
+    ? [geo.location.lng, geo.location.lat]
+    : [-71.0589, 42.3601];
+
+  const proximity: [number, number] = mapCenter;
+
   return (
     <div className="h-screen w-screen relative">
       <Nav />
       <Map
         onLocationSelect={(lat, lng) => handleLocationSelect(lat, lng)}
+        center={mapCenter}
         marker={marker}
         className="w-full h-full"
       />
@@ -47,6 +71,7 @@ export default function Home() {
         <AddressSearch
           onResult={(lat, lng, address) => handleLocationSelect(lat, lng, address)}
           placeholder="Where do you want to start?"
+          proximity={proximity}
         />
       </div>
 

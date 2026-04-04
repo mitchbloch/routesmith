@@ -6,6 +6,7 @@ import { getMapboxToken } from '@/lib/mapbox';
 
 interface MapProps {
   onLocationSelect?: (lat: number, lng: number) => void;
+  onMapReady?: (map: mapboxgl.Map) => void;
   center?: [number, number]; // [lng, lat]
   zoom?: number;
   marker?: [number, number] | null;
@@ -15,6 +16,7 @@ interface MapProps {
 
 export default function Map({
   onLocationSelect,
+  onMapReady,
   center = [-71.0589, 42.3601], // Boston default
   zoom = 12,
   marker,
@@ -54,6 +56,10 @@ export default function Map({
         onLocationSelect(e.lngLat.lat, e.lngLat.lng);
       });
     }
+
+    map.on('load', () => {
+      onMapReady?.(map);
+    });
 
     mapRef.current = map;
 
