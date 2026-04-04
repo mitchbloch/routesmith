@@ -26,7 +26,7 @@ function rowToRoute(row: Record<string, unknown>): SavedRoute {
 /** Convert SavedRoute (camelCase) to Supabase row (snake_case) */
 function routeToRow(route: SavedRoute, userId: string) {
   return {
-    id: route.id,
+    // Omit client-side id — let Postgres generate a UUID (nanoid ids are not valid UUIDs)
     user_id: userId,
     name: route.name,
     custom_name: route.customName ?? null,

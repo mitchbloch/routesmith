@@ -15,10 +15,11 @@ npm run lint         # ESLint
 
 Copy `.env.local.example` to `.env.local` and set:
 ```
-NEXT_PUBLIC_MAPBOX_TOKEN=your_token_here
-NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
+NEXT_PUBLIC_MAPBOX_TOKEN=<set in .env.local + Vercel>
+NEXT_PUBLIC_SUPABASE_URL=https://oqmlrkogthnjncqexwby.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<set in .env.local + Vercel>
 ```
+Supabase project ID: `oqmlrkogthnjncqexwby` | Mapbox account: `mbloch`
 
 ## Architecture
 
@@ -81,7 +82,7 @@ RLS: `auth.uid() = user_id` on user-owned tables. Auto-discovered corridors read
 - **Quick Wins**: Done — loading skeletons, error boundaries, mobile responsive polish
 - **Stretch Goals**: Done — SSR OpenGraph meta, PWA manifest, reverse geocoder, P2P destination picker, real elevation via Tilequery
 - **Algorithm Improvements**: Done — hard distance filter, 12 candidates (3 targets × 4 bearings), waypoint radius calibration, `continue_straight=true`, trail/path snapping, geocoder proximity bias, results caching, rounded scores
-- **Infrastructure (Phase 1)**: In progress — Supabase backend, auth, DAL, API routes, Vercel deployment done. E2E verification remaining.
+- **Infrastructure (Phase 1)**: ~80% done — Supabase backend, auth, DAL, API routes, Vercel deployment done. E2E verification remaining. Paused — will resume when routesmith is next prioritized.
 
 ## Refactor Plan (4 Phases)
 
