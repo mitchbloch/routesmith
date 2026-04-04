@@ -49,8 +49,8 @@
 ### 1.8 End-to-End Verification
 - [x] `npm run build` passes clean
 - [x] Auth redirect works (wizard/library → login)
-- [ ] Login → sign in → redirects to home
-- [ ] Generate route → save → refresh → persists from Supabase
+- [x] Login → sign in → redirects to home
+- [x] Generate route → save → refresh → persists from Supabase
 - [ ] localStorage migration works for existing saved routes
 - [ ] Shared route URLs (`/route/[id]`) work without auth
 - [ ] Verify on live Vercel URL
@@ -65,37 +65,43 @@
 ## Phase 2: Route Quality (Corridor-Based Generation)
 
 ### 2.1 Enhanced Overpass Query
-- [ ] Add bridge, named trail, multi-use path tags to query
-- [ ] Update `OverpassData` type with `bridges`, `namedRoutes`
-- [ ] Increase search radius for corridor discovery
+- [x] Add bridge, named trail, multi-use path tags to query
+- [x] Update `OverpassData` type with `bridges`, `namedRoutes`
+- [x] Increase search radius for corridor discovery (1.5× max distance, min 5km)
+- [x] Increase Overpass timeout from 15s to 25s
 
 ### 2.2 Corridor Graph Builder
-- [ ] Create `src/lib/corridorGraph.ts`
-- [ ] Implement segment extraction from Overpass data
-- [ ] Implement collinear segment merging
-- [ ] Implement node identification (bridges, intersections, dead ends)
-- [ ] Implement quality scoring for segments
-- [ ] Build adjacency list
+- [x] Create `src/lib/corridorGraph.ts`
+- [x] Implement segment extraction from Overpass data
+- [x] Implement endpoint snapping via grid spatial index (20m tolerance)
+- [x] Implement collinear segment merging
+- [x] Implement node identification (bridges, intersections, dead ends)
+- [x] Implement quality scoring for segments (dedicated path, named, near water/park, surface)
+- [x] Build adjacency list
+- [x] Implement graph density assessment (`assessGraphDensity`)
 
 ### 2.3 Corridor-Based Route Planner
-- [ ] Create `src/lib/corridorPlanner.ts`
-- [ ] Strategy A: Single corridor out-and-back (2-3 mi)
-- [ ] Strategy B: Two-corridor loop (3-4 mi)
-- [ ] Strategy C: Multi-corridor loop (4-5+ mi)
-- [ ] Strategy D: Exploratory (variety)
+- [x] Create `src/lib/corridorPlanner.ts`
+- [x] Strategy A: Single corridor out-and-back (2-3 mi)
+- [x] Strategy B: Two-corridor loop (3-4 mi)
+- [x] Strategy C: Multi-corridor loop (4-5+ mi) — BFS with distance budget + heading-home heuristic
+- [x] Strategy D: Exploratory (variety) — seeded random walk
+- [x] Waypoint extraction with 20-waypoint cap for Mapbox API
 
 ### 2.4 Integration
-- [ ] Update `src/lib/routeGenerator.ts` with corridor planner
-- [ ] Add fallback to compass-bearing for sparse data
-- [ ] Update scoring: corridor adherence (25pts), smoothness (10pts)
-- [ ] Rebalance existing scoring weights
+- [x] Update `src/lib/routeGenerator.ts` with corridor planner
+- [x] Add fallback to compass-bearing for sparse data
+- [x] Update scoring: corridor adherence (20pts)
+- [x] Rebalance scoring weights (15/20/20/15/20/10)
+- [x] Update route detail page score display
 
 ### 2.5 Verification
-- [ ] Routes follow corridors in Cambridge/Boston
+- [x] `npm run build` passes clean
+- [x] Fallback works for sparse OSM areas (verified when Overpass was down)
+- [ ] Routes follow corridors in Cambridge/Boston (pending Overpass API availability)
 - [ ] No zigzags through residential streets
 - [ ] Multiple distinct routes from same start
-- [ ] Fallback works for sparse OSM areas
-- [ ] Performance < 10 seconds
+- [ ] Performance < 10 seconds with corridor routing active
 
 ---
 

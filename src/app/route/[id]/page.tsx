@@ -176,16 +176,19 @@ export default function RouteDetailPage() {
             </div>
             <div className="space-y-1 text-xs text-blue-700">
               <div className="flex justify-between">
-                <span>Distance fit</span><span>{route.score.distanceFit}/20</span>
+                <span>Distance fit</span><span>{route.score.distanceFit}/15</span>
               </div>
               <div className="flex justify-between">
-                <span>Elevation</span><span>{route.score.elevationMatch}/25</span>
+                <span>Elevation</span><span>{route.score.elevationMatch}/20</span>
               </div>
               <div className="flex justify-between">
-                <span>Scenery</span><span>{route.score.sceneryMatch}/25</span>
+                <span>Scenery</span><span>{route.score.sceneryMatch}/20</span>
               </div>
               <div className="flex justify-between">
-                <span>Safety</span><span>{route.score.safetyMatch}/20</span>
+                <span>Safety</span><span>{route.score.safetyMatch}/15</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Corridor</span><span>{route.score.corridorAdherence}/20</span>
               </div>
               <div className="flex justify-between">
                 <span>Diversity</span><span>{route.score.diversityBonus}/10</span>

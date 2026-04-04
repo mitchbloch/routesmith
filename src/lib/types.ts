@@ -20,11 +20,12 @@ export interface UserPreferences {
 
 export interface RouteScore {
   overall: number;
-  distanceFit: number;
-  elevationMatch: number;
-  sceneryMatch: number;
-  safetyMatch: number;
-  diversityBonus: number;
+  distanceFit: number;       // 15pts (was 20)
+  elevationMatch: number;    // 20pts (was 25)
+  sceneryMatch: number;      // 20pts (was 25)
+  safetyMatch: number;       // 15pts (was 20)
+  corridorAdherence: number; // 20pts (new)
+  diversityBonus: number;    // 10pts
 }
 
 export interface GeneratedRoute {
@@ -54,6 +55,8 @@ export interface OverpassData {
   water: GeoJSON.Feature[];
   paths: GeoJSON.Feature[];
   crossings: GeoJSON.Feature[];
+  bridges: GeoJSON.Feature[];
+  namedRoutes: GeoJSON.Feature[];
 }
 
 export const ACTIVITY_DEFAULTS: Record<ActivityType, { minDist: number; maxDist: number; pace: number }> = {

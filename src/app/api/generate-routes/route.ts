@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     const toMeters = preferences.distanceUnit === 'miles' ? milesToMeters : kmToMeters;
     const maxMeters = toMeters(preferences.distanceMax);
-    const radius = Math.max(maxMeters, 3000);
+    const radius = Math.max(maxMeters * 1.5, 5000);
 
     const bbox = boundingBox(
       preferences.startLocation.lat,

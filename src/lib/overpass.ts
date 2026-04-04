@@ -5,7 +5,7 @@ const OVERPASS_API = 'https://overpass-api.de/api/interpreter';
 function buildQuery(south: number, west: number, north: number, east: number): string {
   const bbox = `${south},${west},${north},${east}`;
   return `
-[out:json][timeout:15];
+[out:json][timeout:25];
 (
   // Parks and green spaces
   way["leisure"="park"](${bbox});
@@ -20,6 +20,15 @@ function buildQuery(south: number, west: number, north: number, east: number): s
   way["highway"="footway"](${bbox});
   way["highway"="path"](${bbox});
   way["highway"="pedestrian"](${bbox});
+  way["highway"="track"](${bbox});
+  way["highway"="bridleway"](${bbox});
+  way["highway"="living_street"](${bbox});
+  // Bridges
+  way["bridge"="yes"](${bbox});
+  // Named routes and trails
+  way["route"="hiking"](${bbox});
+  way["route"="bicycle"](${bbox});
+  way["route"="foot"](${bbox});
   // Crossings
   node["highway"="crossing"](${bbox});
   node["highway"="traffic_signals"](${bbox});
@@ -33,6 +42,8 @@ function parseOverpassResponse(data: { elements: Array<Record<string, unknown>> 
   const water: GeoJSON.Feature[] = [];
   const paths: GeoJSON.Feature[] = [];
   const crossings: GeoJSON.Feature[] = [];
+  const bridges: GeoJSON.Feature[] = [];
+  const namedRoutes: GeoJSON.Feature[] = [];
 
   for (const el of data.elements) {
     const tags = (el.tags || {}) as Record<string, string>;
@@ -55,17 +66,28 @@ function parseOverpassResponse(data: { elements: Array<Record<string, unknown>> 
         properties: tags,
       };
 
+      // Classify into categories (a feature can appear in multiple)
       if (tags.leisure === 'park' || tags.landuse === 'recreation_ground') {
         parks.push(feature);
       } else if (tags.natural === 'water' || tags.waterway) {
         water.push(feature);
-      } else if (['cycleway', 'footway', 'path', 'pedestrian'].includes(tags.highway)) {
+      } else if (['cycleway', 'footway', 'path', 'pedestrian', 'track', 'bridleway', 'living_street'].includes(tags.highway)) {
         paths.push(feature);
+      }
+
+      // Bridge overlay — a way can be both a path and a bridge
+      if (tags.bridge === 'yes') {
+        bridges.push(feature);
+      }
+
+      // Named routes/trails
+      if (tags.route === 'hiking' || tags.route === 'bicycle' || tags.route === 'foot' || (tags.name && ['cycleway', 'footway', 'path', 'track'].includes(tags.highway))) {
+        namedRoutes.push(feature);
       }
     }
   }
 
-  return { parks, water, paths, crossings };
+  return { parks, water, paths, crossings, bridges, namedRoutes };
 }
 
 export async function queryOverpass(
@@ -80,7 +102,7 @@ export async function queryOverpass(
 
   if (!res.ok) {
     console.error('Overpass API error:', res.status);
-    return { parks: [], water: [], paths: [], crossings: [] };
+    return { parks: [], water: [], paths: [], crossings: [], bridges: [], namedRoutes: [] };
   }
 
   const data = await res.json();

@@ -33,7 +33,7 @@ Supabase project ID: `oqmlrkogthnjncqexwby` | Mapbox account: `mbloch`
 
 - `src/app/` — Pages (landing, wizard, results, route/[id], library, login) + API routes
 - `src/components/` — Map, AddressSearch, RouteCard, WizardStep, etc.
-- `src/lib/` — Core logic: types, geometry, scoring, routeGenerator, overpass, storage, mapbox, geocoding, elevation
+- `src/lib/` — Core logic: types, geometry, scoring, routeGenerator, corridorGraph, corridorPlanner, overpass, storage, mapbox, geocoding, elevation
 - `src/lib/supabase/` — Supabase client (server, browser, middleware, auth helper)
 - `src/lib/routes.ts` — DAL: saved routes CRUD (snake_case ↔ camelCase row converters)
 - `src/lib/corridors.ts` — DAL: corridor CRUD (for Phase 2)
@@ -53,15 +53,16 @@ Supabase project ID: `oqmlrkogthnjncqexwby` | Mapbox account: `mbloch`
 
 1. User sets start location on map (defaults to Boston, reverse geocodes map clicks) → wizard collects preferences (activity, route type, distance, elevation, scenery [multi-select], safety [multi-select]). P2P adds destination picker step.
 2. POST `/api/generate-routes` with preferences (scenery/safety are arrays)
-3. Server queries Overpass API for area features, generates 12 loop candidates (3 distance targets at p25/p50/p75 × 4 bearings) via Mapbox Directions with `continue_straight=true`. Waypoints snap to nearby trails/paths from Overpass data.
-4. Hard-filters candidates to user's distance range (5% tolerance), scores survivors (distance fit, elevation, scenery, safety, diversity) → returns top 3
+3. Server builds a corridor graph from Overpass data (paths, bridges, named trails). If graph density is adequate (totalPathLength >= 2× target, ≥4 nodes), uses corridor-based routing with 4 strategies (out-and-back, two-corridor loop, multi-corridor loop, exploratory). Falls back to compass-bearing waypoints for sparse areas.
+4. Each candidate is routed through Mapbox Directions with `continue_straight=true`, scored, and hard-filtered to user's distance range (5% tolerance) → returns top 3.
 5. Client displays routes on map with detail cards. Results cached in sessionStorage for instant back-navigation.
 
 ### Scoring (0-100 points, integer scores)
-- Distance fit: 20pts — full score if within range, degrades with overshoot
-- Elevation match: 25pts — grade % vs preference (flat/moderate/hilly)
-- Scenery match: 25pts — ratio of route near Overpass features (parks/water)
-- Safety match: 20pts — dedicated path ratio or crossings per km
+- Distance fit: 15pts — full score if within range, degrades with overshoot
+- Elevation match: 20pts — grade % vs preference (flat/moderate/hilly)
+- Scenery match: 20pts — ratio of route near Overpass features (parks/water)
+- Safety match: 15pts — dedicated path ratio or crossings per km
+- Corridor adherence: 20pts — fraction of route within 30m of corridor graph segments
 - Diversity bonus: 10pts — geographic separation between candidates
 
 ### Database Schema
@@ -82,13 +83,14 @@ RLS: `auth.uid() = user_id` on user-owned tables. Auto-discovered corridors read
 - **Quick Wins**: Done — loading skeletons, error boundaries, mobile responsive polish
 - **Stretch Goals**: Done — SSR OpenGraph meta, PWA manifest, reverse geocoder, P2P destination picker, real elevation via Tilequery
 - **Algorithm Improvements**: Done — hard distance filter, 12 candidates (3 targets × 4 bearings), waypoint radius calibration, `continue_straight=true`, trail/path snapping, geocoder proximity bias, results caching, rounded scores
-- **Infrastructure (Phase 1)**: ~80% done — Supabase backend, auth, DAL, API routes, Vercel deployment done. E2E verification remaining. Paused — will resume when routesmith is next prioritized.
+- **Infrastructure (Phase 1)**: Complete — Supabase backend, auth, DAL, API routes, Vercel deployment, save/persist verified.
+- **Route Quality (Phase 2)**: In progress — corridor graph builder, corridor planner (4 strategies), scoring rebalance, geolocation default.
 
 ## Refactor Plan (4 Phases)
 
 Full plan: `tasks/todo.md`
 
-1. **Phase 1: Infrastructure** — Supabase + Vercel + auth + localStorage migration. ~80% done.
+1. **Phase 1: Infrastructure** — Supabase + Vercel + auth + localStorage migration. Done.
 2. **Phase 2: Route Quality** — Corridor-based route generation (replacing compass-bearing waypoints). Key new files: `corridorGraph.ts`, `corridorPlanner.ts`.
 3. **Phase 3: Claude Integration** — AI-generated route names/descriptions, NL preferences.
 4. **Phase 4: RLHF & Polish** — Feedback collection, scoring tuning, corridor favorites, UX polish.
