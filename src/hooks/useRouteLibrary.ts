@@ -38,24 +38,31 @@ export function useRouteLibrary() {
       startAddress,
     };
 
-    // Optimistic update
+    // Optimistic update with client-side id
     setRoutes(prev => {
       if (prev.some(r => r.id === route.id)) return prev;
       return [saved, ...prev];
     });
 
     try {
-      await fetch('/api/routes', {
+      const res = await fetch('/api/routes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(saved),
       });
+
+      if (!res.ok) throw new Error('Failed to save');
+
+      // Replace client-side id with DB-generated UUID
+      const { id: dbId } = await res.json();
+      const persisted = { ...saved, id: dbId };
+      setRoutes(prev => prev.map(r => r.id === route.id ? persisted : r));
+      return persisted;
     } catch {
       // Revert on failure
       setRoutes(prev => prev.filter(r => r.id !== route.id));
+      return saved;
     }
-
-    return saved;
   }, []);
 
   const remove = useCallback(async (id: string) => {
