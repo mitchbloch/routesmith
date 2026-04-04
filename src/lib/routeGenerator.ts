@@ -4,6 +4,9 @@ import { generateLoopWaypoints, haversineDistance, milesToMeters, kmToMeters } f
 import { scoreRoute, applyDiversityBonus } from './scoring';
 import { directionsUrl } from './mapbox';
 import { getRouteElevation } from './elevation';
+import { buildCorridorGraph, assessGraphDensity } from './corridorGraph';
+import type { CorridorGraph } from './corridorGraph';
+import { planCorridorRoutes } from './corridorPlanner';
 
 const ROUTE_NAMES = [
   'Scenic Loop', 'Riverside Run', 'Park Circuit', 'Neighborhood Tour',
@@ -100,52 +103,37 @@ export async function generateRoutes(
   const maxMeters = toMeters(preferences.distanceMax);
   const targetMeters = (minMeters + maxMeters) / 2;
   const profile = profileForActivity(activityType);
+  const emptyScore = { overall: 0, distanceFit: 0, elevationMatch: 0, sceneryMatch: 0, safetyMatch: 0, corridorAdherence: 0, diversityBonus: 0 };
 
   const candidates: GeneratedRoute[] = [];
 
-  if (routeType === 'loop') {
-    // Generate 12 candidates by varying:
-    //   - Distance target: p25, p50, p75 of user's range
-    //   - Bearing: 4 directions per target
-    //   - Waypoint count: alternating 3 and 4 per loop
-    // Hard distance filter keeps only those within range.
-    const range = maxMeters - minMeters;
-    const distanceTargets = [
-      minMeters + range * 0.25,  // 25th percentile
-      targetMeters,              // 50th (midpoint)
-      minMeters + range * 0.75,  // 75th percentile
-    ];
-    const bearings = [0, 90, 180, 270];
+  // Build corridor graph for scoring (used regardless of routing strategy)
+  const searchRadius = Math.max(maxMeters * 1.5, 5000);
+  const corridorGraph = buildCorridorGraph(overpassData, startLocation, searchRadius);
 
-    const variations: { target: number; waypoints: number; bearing: number }[] = [];
-    for (const target of distanceTargets) {
-      for (let i = 0; i < bearings.length; i++) {
-        variations.push({ target, waypoints: i % 2 === 0 ? 3 : 4, bearing: bearings[i] });
-      }
+  if (routeType === 'loop') {
+    // Try corridor-based routing first, fall back to compass-bearing
+    const density = assessGraphDensity(corridorGraph, startLocation, targetMeters);
+
+    let waypointSets: { waypoints: [number, number][]; name: string }[];
+
+    if (density.adequate) {
+      // Corridor-based routing
+      const corridorRoutes = planCorridorRoutes(corridorGraph, startLocation, targetMeters, 12);
+      waypointSets = corridorRoutes.map((cr, i) => ({
+        waypoints: cr.waypoints,
+        name: `${ROUTE_NAMES[i % ROUTE_NAMES.length]} (${cr.strategy})`,
+      }));
+    } else {
+      // Fallback: compass-bearing approach
+      waypointSets = generateCompassBearingCandidates(
+        startLocation, targetMeters, minMeters, maxMeters, overpassData,
+      );
     }
 
-    // Extract points along known trails/paths/parks to bias waypoints toward them
-    const attractors = extractAttractorPoints(overpassData);
-    // Nudge radius: waypoints within this distance of a trail get pulled toward it
-    const nudgeRadius = Math.max(targetMeters * 0.3, 500);
-
-    const routePromises = variations.map(async (v, idx) => {
+    const routePromises = waypointSets.map(async ({ waypoints, name }, idx) => {
       try {
-        const rawWaypoints = generateLoopWaypoints(
-          startLocation.lat, startLocation.lng,
-          v.target, v.waypoints, v.bearing
-        );
-
-        // Snap waypoints onto nearby paths/parks so the router uses them
-        const waypoints = rawWaypoints.map(wp => snapToNearbyPath(wp, attractors, nudgeRadius));
-
-        const coords: [number, number][] = [
-          [startLocation.lng, startLocation.lat],
-          ...waypoints,
-          [startLocation.lng, startLocation.lat],
-        ];
-
-        const url = directionsUrl(profile, coords);
+        const url = directionsUrl(profile, waypoints);
         const res = await fetch(url);
         if (!res.ok) return null;
 
@@ -153,26 +141,25 @@ export async function generateRoutes(
         const route = data.routes?.[0];
         if (!route) return null;
 
-        // Try real elevation from Tilequery API, fall back to heuristic
         const routeCoords: [number, number][] = route.geometry?.coordinates || [];
         const realElevation = await getRouteElevation(routeCoords);
         const { gain, loss } = realElevation || estimateElevation(route.distance, idx);
 
         const generated: GeneratedRoute = {
           id: nanoid(10),
-          name: ROUTE_NAMES[idx % ROUTE_NAMES.length],
+          name,
           geometry: route.geometry,
           distance: route.distance,
           duration: route.duration,
           elevationGain: gain,
           elevationLoss: loss,
-          score: { overall: 0, distanceFit: 0, elevationMatch: 0, sceneryMatch: 0, safetyMatch: 0, diversityBonus: 0 },
+          score: emptyScore,
           tags: [],
-          waypoints: coords,
+          waypoints,
           color: '',
         };
 
-        generated.score = scoreRoute(generated, preferences, overpassData, minMeters, maxMeters);
+        generated.score = scoreRoute(generated, preferences, overpassData, minMeters, maxMeters, corridorGraph);
         generated.tags = generateTags(generated, preferences);
         return generated;
       } catch (e) {
@@ -184,7 +171,7 @@ export async function generateRoutes(
     const results = await Promise.all(routePromises);
     candidates.push(...results.filter((r): r is GeneratedRoute => r !== null));
   } else {
-    // Point-to-point
+    // Point-to-point (unchanged)
     const end = preferences.endLocation;
     if (!end) return [];
 
@@ -211,20 +198,18 @@ export async function generateRoutes(
         duration: route.duration,
         elevationGain: gain,
         elevationLoss: loss,
-        score: { overall: 0, distanceFit: 0, elevationMatch: 0, sceneryMatch: 0, safetyMatch: 0, diversityBonus: 0 },
+        score: emptyScore,
         tags: [],
         waypoints: coords,
         color: '',
       };
-      generated.score = scoreRoute(generated, preferences, overpassData, minMeters, maxMeters);
+      generated.score = scoreRoute(generated, preferences, overpassData, minMeters, maxMeters, corridorGraph);
       generated.tags = generateTags(generated, preferences);
       candidates.push(generated);
     }
   }
 
   // Hard filter: distance range is a first-order requirement.
-  // With 18 candidates spanning min/mid/max targets, we can enforce strictly.
-  // Small 5% tolerance to avoid discarding routes that are a few hundred meters off.
   const tolerance = 0.05;
   const hardMin = minMeters * (1 - tolerance);
   const hardMax = maxMeters * (1 + tolerance);
@@ -246,4 +231,51 @@ export async function generateRoutes(
     ...r,
     color: colors[i],
   }));
+}
+
+/** Fallback: compass-bearing waypoint generation (original algorithm) */
+function generateCompassBearingCandidates(
+  startLocation: { lat: number; lng: number },
+  targetMeters: number,
+  minMeters: number,
+  maxMeters: number,
+  overpassData: OverpassData,
+): { waypoints: [number, number][]; name: string }[] {
+  const range = maxMeters - minMeters;
+  const distanceTargets = [
+    minMeters + range * 0.25,
+    (minMeters + maxMeters) / 2,
+    minMeters + range * 0.75,
+  ];
+  const bearings = [0, 90, 180, 270];
+
+  const attractors = extractAttractorPoints(overpassData);
+  const nudgeRadius = Math.max(targetMeters * 0.3, 500);
+
+  const results: { waypoints: [number, number][]; name: string }[] = [];
+
+  for (const target of distanceTargets) {
+    for (let i = 0; i < bearings.length; i++) {
+      const numWaypoints = i % 2 === 0 ? 3 : 4;
+      const rawWaypoints = generateLoopWaypoints(
+        startLocation.lat, startLocation.lng,
+        target, numWaypoints, bearings[i],
+      );
+
+      const snapped = rawWaypoints.map(wp => snapToNearbyPath(wp, attractors, nudgeRadius));
+
+      const coords: [number, number][] = [
+        [startLocation.lng, startLocation.lat],
+        ...snapped,
+        [startLocation.lng, startLocation.lat],
+      ];
+
+      results.push({
+        waypoints: coords,
+        name: ROUTE_NAMES[results.length % ROUTE_NAMES.length],
+      });
+    }
+  }
+
+  return results;
 }

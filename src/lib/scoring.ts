@@ -6,6 +6,7 @@ import type {
   SceneryPreference,
   SafetyPreference,
 } from './types';
+import type { CorridorGraph } from './corridorGraph';
 import { haversineDistance, routeGeographicCenter } from './geometry';
 
 function scoreDistanceFit(
@@ -16,9 +17,9 @@ function scoreDistanceFit(
   const mid = (minMeters + maxMeters) / 2;
   const range = maxMeters - minMeters;
   const diff = Math.abs(routeDistanceMeters - mid);
-  if (diff <= range / 2) return 20;
+  if (diff <= range / 2) return 15;
   const overshoot = diff - range / 2;
-  return Math.max(0, 20 - (overshoot / mid) * 40);
+  return Math.max(0, 15 - (overshoot / mid) * 30);
 }
 
 function scoreElevation(
@@ -26,22 +27,22 @@ function scoreElevation(
   distanceMeters: number,
   preference: UserPreferences['elevation']
 ): number {
-  if (preference === 'no-preference') return 25;
+  if (preference === 'no-preference') return 20;
 
   const gradePercent = distanceMeters > 0 ? (elevationGain / distanceMeters) * 100 : 0;
 
   switch (preference) {
     case 'flat':
-      if (gradePercent < 1) return 25;
-      if (gradePercent < 2) return 18;
-      return Math.max(0, 25 - gradePercent * 5);
+      if (gradePercent < 1) return 20;
+      if (gradePercent < 2) return 14;
+      return Math.max(0, 20 - gradePercent * 4);
     case 'moderate':
-      if (gradePercent >= 1.5 && gradePercent <= 4) return 25;
-      return Math.max(0, 25 - Math.abs(gradePercent - 2.75) * 6);
+      if (gradePercent >= 1.5 && gradePercent <= 4) return 20;
+      return Math.max(0, 20 - Math.abs(gradePercent - 2.75) * 5);
     case 'hilly':
-      if (gradePercent > 4) return 25;
-      if (gradePercent > 2.5) return 18;
-      return Math.max(0, gradePercent * 5);
+      if (gradePercent > 4) return 20;
+      if (gradePercent > 2.5) return 14;
+      return Math.max(0, gradePercent * 4);
   }
 }
 
@@ -75,7 +76,7 @@ function scoreScenerySingle(
   }
 
   const ratio = samplePoints.length > 0 ? nearFeatureCount / samplePoints.length : 0;
-  return Math.round(ratio * 25);
+  return Math.round(ratio * 20);
 }
 
 function scoreScenery(
@@ -84,7 +85,7 @@ function scoreScenery(
   preferences: UserPreferences['scenery']
 ): number {
   const prefs = Array.isArray(preferences) ? preferences : [preferences];
-  if (prefs.includes('no-preference')) return 25;
+  if (prefs.includes('no-preference')) return 20;
 
   const samplePoints = routeCoords.filter((_, i) => i % Math.max(1, Math.floor(routeCoords.length / 20)) === 0);
   const threshold = 200;
@@ -124,7 +125,7 @@ function scoreSafetySingle(
       }
     }
     const ratio = samplePoints.length > 0 ? onPath / samplePoints.length : 0;
-    return Math.round(ratio * 20);
+    return Math.round(ratio * 15);
   }
 
   // minimize-crossings
@@ -136,10 +137,10 @@ function scoreSafetySingle(
   }).length;
 
   const perKm = routeDistanceMeters > 0 ? crossingCount / (routeDistanceMeters / 1000) : 0;
-  if (perKm < 1) return 20;
-  if (perKm < 3) return 14;
-  if (perKm < 6) return 8;
-  return 4;
+  if (perKm < 1) return 15;
+  if (perKm < 3) return 10;
+  if (perKm < 6) return 6;
+  return 3;
 }
 
 function scoreSafety(
@@ -149,7 +150,7 @@ function scoreSafety(
   preferences: UserPreferences['safety']
 ): number {
   const prefs = Array.isArray(preferences) ? preferences : [preferences];
-  if (prefs.includes('no-preference')) return 20;
+  if (prefs.includes('no-preference')) return 15;
 
   const scores = prefs.map(p =>
     scoreSafetySingle(routeCoords, routeDistanceMeters, overpassData, p)
@@ -157,26 +158,61 @@ function scoreSafety(
   return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
 }
 
+/** Score how well a route adheres to corridor graph segments (0-20 pts) */
+function scoreCorridorAdherence(
+  routeCoords: [number, number][],
+  corridorGraph: CorridorGraph | null,
+): number {
+  if (!corridorGraph || corridorGraph.segments.size === 0) return 0;
+
+  const samplePoints = routeCoords.filter(
+    (_, i) => i % Math.max(1, Math.floor(routeCoords.length / 20)) === 0,
+  );
+
+  // Collect all corridor segment coordinates for proximity checks
+  const corridorCoords: [number, number][] = [];
+  for (const seg of corridorGraph.segments.values()) {
+    // Sample every few coords from each segment
+    for (let i = 0; i < seg.coords.length; i += Math.max(1, Math.floor(seg.coords.length / 5))) {
+      corridorCoords.push(seg.coords[i]);
+    }
+  }
+
+  let onCorridor = 0;
+  for (const [lng, lat] of samplePoints) {
+    const near = corridorCoords.some(([cLng, cLat]) =>
+      haversineDistance(lat, lng, cLat, cLng) < 30,
+    );
+    if (near) onCorridor++;
+  }
+
+  const ratio = samplePoints.length > 0 ? onCorridor / samplePoints.length : 0;
+  return Math.round(ratio * 20);
+}
+
 export function scoreRoute(
   route: { distance: number; elevationGain: number; geometry: GeoJSON.LineString },
   preferences: UserPreferences,
   overpassData: OverpassData,
   minMeters: number,
-  maxMeters: number
+  maxMeters: number,
+  corridorGraph?: CorridorGraph | null,
 ): RouteScore {
   const coords = route.geometry.coordinates as [number, number][];
   const distanceFit = Math.round(scoreDistanceFit(route.distance, minMeters, maxMeters));
   const elevationMatch = Math.round(scoreElevation(route.elevationGain, route.distance, preferences.elevation));
   const sceneryMatch = Math.round(scoreScenery(coords, overpassData, preferences.scenery));
   const safetyMatch = Math.round(scoreSafety(coords, route.distance, overpassData, preferences.safety));
+  const corridorAdherence = scoreCorridorAdherence(coords, corridorGraph ?? null);
 
   return {
     distanceFit,
     elevationMatch,
     sceneryMatch,
     safetyMatch,
+    corridorAdherence,
     diversityBonus: 0, // set later
-    overall: distanceFit + elevationMatch + sceneryMatch + safetyMatch,
+    overall: distanceFit + elevationMatch + sceneryMatch + safetyMatch + corridorAdherence,
   };
 }
 
