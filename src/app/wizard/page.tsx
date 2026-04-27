@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import Nav from '@/components/Nav';
 import WizardStep from '@/components/WizardStep';
 import OptionSelector from '@/components/OptionSelector';
 import DistanceSlider from '@/components/DistanceSlider';
@@ -113,7 +114,8 @@ export default function WizardPage() {
 
   const logicalStep = getLogicalStep();
 
-  switch (logicalStep) {
+  const stepContent = (() => {
+    switch (logicalStep) {
     case 'activity':
       return (
         <WizardStep step={1} totalSteps={totalSteps} title="What's your activity?" onNext={next}>
@@ -245,4 +247,12 @@ export default function WizardPage() {
     default:
       return null;
   }
+  })();
+
+  return (
+    <>
+      <Nav />
+      {stepContent}
+    </>
+  );
 }
