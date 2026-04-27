@@ -113,14 +113,18 @@ export default function RouteDetailPage() {
 
   if (!route) {
     return (
-      <div className="h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-500 mb-4">Route not found</p>
+      <div className="h-screen flex items-center justify-center bg-paper">
+        <div className="field-card max-w-sm mx-4 px-6 py-6 text-center">
+          <p className="label-mono-sm mb-2">— Not in the fieldbook</p>
+          <p className="font-display text-[20px] text-ink mb-4"
+             style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}>
+            We can&apos;t find this route.
+          </p>
           <button
             onClick={() => router.push('/')}
-            className="px-6 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+            className="bg-vermillion text-paper px-5 py-2 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
           >
-            Go Home
+            Back to start
           </button>
         </div>
       </div>
@@ -129,129 +133,167 @@ export default function RouteDetailPage() {
 
   const savedRoute = savedRoutes.find(r => r.id === route.id) as SavedRoute | undefined;
 
+  const scoreRows: Array<[string, number, number]> = [
+    ['Distance fit', route.score.distanceFit, 15],
+    ['Elevation', route.score.elevationMatch, 20],
+    ['Scenery', route.score.sceneryMatch, 20],
+    ['Safety', route.score.safetyMatch, 15],
+    ['Corridor', route.score.corridorAdherence, 20],
+    ['Diversity', route.score.diversityBonus, 10],
+  ];
+
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col bg-paper">
       <Nav />
 
       <div className="flex-1 flex flex-col lg:flex-row pt-14">
         {/* Map */}
-        <div className="h-[40vh] sm:h-[50vh] lg:h-full lg:flex-1">
+        <div className="h-[40vh] sm:h-[50vh] lg:h-full lg:flex-1 relative">
+          <span className="absolute top-2 left-2 w-3 h-3 border-l border-t border-ink z-10 pointer-events-none" aria-hidden />
+          <span className="absolute top-2 right-2 w-3 h-3 border-r border-t border-ink z-10 pointer-events-none" aria-hidden />
+          <span className="absolute bottom-2 left-2 w-3 h-3 border-l border-b border-ink z-10 pointer-events-none" aria-hidden />
+          <span className="absolute bottom-2 right-2 w-3 h-3 border-r border-b border-ink z-10 pointer-events-none" aria-hidden />
           <MapWithRoute routes={[route]} />
         </div>
 
         {/* Detail panel */}
-        <div className="flex-1 lg:w-96 lg:flex-none overflow-y-auto p-4 sm:p-6 space-y-6">
-          {/* Name */}
-          <div>
-            {editing ? (
-              <div className="flex gap-2">
-                <input
-                  value={customName}
-                  onChange={(e) => setCustomName(e.target.value)}
-                  className="flex-1 text-xl font-bold border-b-2 border-blue-500 outline-none pb-1"
-                  autoFocus
-                  onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-                />
-                <button onClick={handleRename} className="text-blue-500 font-medium">Save</button>
-              </div>
-            ) : (
-              <h1
-                className="text-2xl font-bold text-gray-900 cursor-pointer hover:text-blue-600"
-                onClick={() => isSaved && setEditing(true)}
-                title={isSaved ? 'Click to rename' : ''}
-              >
-                {savedRoute?.customName || route.name}
-              </h1>
-            )}
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4">
-            <div className="bg-gray-50 rounded-xl p-2 sm:p-3 text-center">
-              <p className="text-sm text-gray-500">Distance</p>
-              <p className="text-base sm:text-lg font-semibold">{formatDistance(route.distance)}</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-2 sm:p-3 text-center">
-              <p className="text-sm text-gray-500">Duration</p>
-              <p className="text-base sm:text-lg font-semibold">{formatDuration(route.duration)}</p>
-            </div>
-            <div className="bg-gray-50 rounded-xl p-2 sm:p-3 text-center">
-              <p className="text-sm text-gray-500">Elevation</p>
-              <p className="text-base sm:text-lg font-semibold">+{Math.round(route.elevationGain * 3.281)} ft</p>
-            </div>
-          </div>
-
-          {/* Score */}
-          <div className="bg-blue-50 rounded-xl p-4">
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-blue-800">Match Score</span>
-              <span className="text-xl font-bold text-blue-600">{route.score.overall}/100</span>
-            </div>
-            <div className="space-y-1 text-xs text-blue-700">
-              <div className="flex justify-between">
-                <span>Distance fit</span><span>{route.score.distanceFit}/15</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Elevation</span><span>{route.score.elevationMatch}/20</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Scenery</span><span>{route.score.sceneryMatch}/20</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Safety</span><span>{route.score.safetyMatch}/15</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Corridor</span><span>{route.score.corridorAdherence}/20</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Diversity</span><span>{route.score.diversityBonus}/10</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Tags */}
-          {route.tags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {route.tags.map((tag) => (
-                <span key={tag} className="px-3 py-1 text-sm rounded-full bg-gray-100 text-gray-600">
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Rating */}
-          {isSaved && (
+        <div className="flex-1 lg:w-[420px] lg:flex-none overflow-y-auto px-5 sm:px-7 py-6 lg:border-l lg:border-hairline">
+          <div className="space-y-6">
+            {/* Plate header */}
             <div>
-              <p className="text-sm text-gray-500 mb-1">Your rating</p>
-              <StarRating rating={savedRoute?.rating || 0} onChange={handleRate} />
+              <div className="flex items-baseline justify-between mb-2">
+                <span className="label-mono-sm">Plate · saved route</span>
+                <span className="coord-mono text-ink-faded">{formatDistance(route.distance)}</span>
+              </div>
+              {editing ? (
+                <div className="flex gap-2">
+                  <input
+                    value={customName}
+                    onChange={(e) => setCustomName(e.target.value)}
+                    className="flex-1 font-display text-[24px] font-semibold bg-transparent border-b border-ink outline-none pb-1 text-ink"
+                    style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}
+                    autoFocus
+                    onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+                  />
+                  <button onClick={handleRename} className="label-mono-sm !text-vermillion px-2">
+                    Save
+                  </button>
+                </div>
+              ) : (
+                <h1
+                  className="font-display text-[28px] sm:text-[30px] font-semibold text-ink leading-[1.05] tracking-tight cursor-pointer hover:text-vermillion transition-colors"
+                  style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 60' }}
+                  onClick={() => isSaved && setEditing(true)}
+                  title={isSaved ? 'Click to rename' : ''}
+                >
+                  {savedRoute?.customName || route.name}
+                </h1>
+              )}
             </div>
-          )}
 
-          {/* Actions */}
-          <div className="flex gap-3">
-            {!isSaved ? (
-              <button
-                onClick={handleSave}
-                className="flex-1 py-3 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
-              >
-                Save Route
-              </button>
-            ) : (
-              <div className="flex-1 py-3 text-center text-green-600 font-medium">
-                Saved
+            {/* Stats grid — three plates with hairlines */}
+            <div className="grid grid-cols-3 border-y border-hairline divide-x divide-hairline">
+              <div className="px-2 py-3 text-center">
+                <p className="label-mono-sm mb-1">Distance</p>
+                <p className="font-display text-[20px] sm:text-[22px] font-semibold text-ink leading-none"
+                   style={{ fontVariationSettings: '"SOFT" 30, "opsz" 36' }}>
+                  {formatDistance(route.distance)}
+                </p>
+              </div>
+              <div className="px-2 py-3 text-center">
+                <p className="label-mono-sm mb-1">Duration</p>
+                <p className="font-display text-[20px] sm:text-[22px] font-semibold text-ink leading-none"
+                   style={{ fontVariationSettings: '"SOFT" 30, "opsz" 36' }}>
+                  {formatDuration(route.duration)}
+                </p>
+              </div>
+              <div className="px-2 py-3 text-center">
+                <p className="label-mono-sm mb-1">Elevation</p>
+                <p className="font-display text-[20px] sm:text-[22px] font-semibold text-ink leading-none"
+                   style={{ fontVariationSettings: '"SOFT" 30, "opsz" 36' }}>
+                  +{Math.round(route.elevationGain * 3.281)}<span className="text-[14px] text-ink-faded ml-0.5">ft</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Match Score block */}
+            <div className="border border-hairline">
+              <div className="flex items-baseline justify-between px-4 py-2 border-b border-hairline bg-paper-deep/40">
+                <span className="label-mono-sm">Match Score</span>
+                <span className="font-display text-[24px] font-semibold text-ink leading-none"
+                      style={{ fontVariationSettings: '"SOFT" 50, "opsz" 36' }}>
+                  {route.score.overall}<span className="text-ink-ghost text-[16px]">/100</span>
+                </span>
+              </div>
+              <ul className="px-4 py-3 space-y-1.5">
+                {scoreRows.map(([label, value, max]) => {
+                  const pct = (value / max) * 100;
+                  return (
+                    <li key={label} className="flex items-center gap-3">
+                      <span className="label-mono-sm w-24 shrink-0">{label}</span>
+                      <span className="flex-1 h-[2px] bg-hairline-soft relative">
+                        <span
+                          className="absolute inset-y-0 left-0 bg-vermillion"
+                          style={{ width: `${pct}%` }}
+                        />
+                      </span>
+                      <span className="coord-mono text-ink-soft tabular-nums w-12 text-right shrink-0">
+                        {value}<span className="text-ink-ghost">/{max}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            {/* Tags */}
+            {route.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {route.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2 py-0.5 label-mono-sm border border-hairline-soft"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             )}
-            <ShareButton route={route} />
-          </div>
 
-          {/* Back */}
-          <button
-            onClick={() => router.back()}
-            className="w-full py-2 text-gray-500 text-sm hover:text-gray-700"
-          >
-            Back to results
-          </button>
+            {/* Rating */}
+            {isSaved && (
+              <div>
+                <p className="label-mono-sm mb-2">Your rating</p>
+                <StarRating rating={savedRoute?.rating || 0} onChange={handleRate} />
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-2 pt-2">
+              {!isSaved ? (
+                <button
+                  onClick={handleSave}
+                  className="flex-1 py-3 bg-vermillion text-paper label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors flex items-center justify-center gap-2 group"
+                >
+                  <span>Save to library</span>
+                  <span className="font-mono text-[12px] group-hover:translate-x-0.5 transition-transform">→</span>
+                </button>
+              ) : (
+                <div className="flex-1 py-3 text-center label-mono-sm !text-forest border border-forest/40 bg-forest/5">
+                  ● Saved
+                </div>
+              )}
+              <ShareButton route={route} />
+            </div>
+
+            {/* Back */}
+            <button
+              onClick={() => router.back()}
+              className="w-full label-mono-sm py-2 text-ink-faded hover:text-ink transition-colors"
+            >
+              ← Back to results
+            </button>
+          </div>
         </div>
       </div>
 

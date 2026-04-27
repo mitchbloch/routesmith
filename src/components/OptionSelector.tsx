@@ -49,7 +49,6 @@ export default function OptionSelector(props: OptionSelectorProps) {
       return;
     }
 
-    // Clicking a real option — remove no-preference if present
     let next = value.filter(v => v !== noPreferenceValue);
 
     if (next.includes(optValue)) {
@@ -58,7 +57,6 @@ export default function OptionSelector(props: OptionSelectorProps) {
       next = [...next, optValue];
     }
 
-    // If nothing selected, fall back to no-preference
     if (next.length === 0) {
       next = [noPreferenceValue];
     }
@@ -68,30 +66,46 @@ export default function OptionSelector(props: OptionSelectorProps) {
 
   return (
     <div
-      className="grid gap-3"
+      className="grid gap-2"
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {options.map((opt) => (
-        <button
-          key={opt.value}
-          onClick={() => handleClick(opt.value)}
-          className={`p-4 rounded-xl border-2 text-left transition-all ${
-            isSelected(opt.value)
-              ? 'border-blue-500 bg-blue-50 shadow-sm'
-              : 'border-gray-200 hover:border-gray-300 bg-white'
-          }`}
-        >
-          <div className="flex items-center gap-3">
-            {opt.icon && <span className="text-2xl">{opt.icon}</span>}
-            <div>
-              <p className="font-medium text-gray-900">{opt.label}</p>
-              {opt.description && (
-                <p className="text-sm text-gray-500 mt-0.5">{opt.description}</p>
-              )}
+      {options.map((opt, i) => {
+        const selected = isSelected(opt.value);
+        return (
+          <button
+            key={opt.value}
+            onClick={() => handleClick(opt.value)}
+            className={`relative p-4 border text-left transition-all group ${
+              selected
+                ? 'border-ink bg-paper-deep'
+                : 'border-hairline bg-paper hover:border-ink-faded hover:bg-paper-deep/50'
+            }`}
+          >
+            {/* Selected stamp — vermillion checkmark in top-right corner */}
+            {selected && (
+              <span className="absolute top-2 right-2 label-mono-sm !text-vermillion">●</span>
+            )}
+
+            <div className="flex items-center gap-3">
+              {opt.icon && <span className="text-2xl shrink-0">{opt.icon}</span>}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-baseline gap-2">
+                  <span className="label-mono-sm shrink-0">{String(i + 1).padStart(2, '0')}</span>
+                  <p
+                    className="font-display text-[16px] font-medium text-ink"
+                    style={{ fontVariationSettings: '"SOFT" 50, "opsz" 18' }}
+                  >
+                    {opt.label}
+                  </p>
+                </div>
+                {opt.description && (
+                  <p className="text-[13px] text-ink-faded mt-1 leading-snug">{opt.description}</p>
+                )}
+              </div>
             </div>
-          </div>
-        </button>
-      ))}
+          </button>
+        );
+      })}
     </div>
   );
 }

@@ -1,21 +1,30 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  axes: ["SOFT", "WONK", "opsz"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Routesmith — Personalized Exercise Routes",
+  title: "Routesmith — A Fieldbook of Routes",
   description:
-    "Generate personalized running, walking, and biking routes based on your preferences for distance, elevation, scenery, and safety.",
+    "A fieldbook for runners, walkers, and cyclists. Plot routes by terrain, scenery, and distance.",
   openGraph: {
-    title: "Routesmith — Personalized Exercise Routes",
+    title: "Routesmith — A Fieldbook of Routes",
     description:
-      "Generate personalized running, walking, and biking routes based on your preferences for distance, elevation, scenery, and safety.",
+      "A fieldbook for runners, walkers, and cyclists. Plot routes by terrain, scenery, and distance.",
     type: "website",
     siteName: "Routesmith",
   },
@@ -33,10 +42,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#3b82f6" />
+        <meta name="theme-color" content="#1B1A17" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${geistSans.variable} font-sans antialiased`}>
+      <body className={`${fraunces.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
     </html>

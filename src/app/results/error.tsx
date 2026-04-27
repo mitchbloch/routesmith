@@ -12,24 +12,30 @@ export default function ResultsError({
   const router = useRouter();
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Route generation failed</h1>
-        <p className="text-gray-500 mb-6">
-          {error.message || 'We couldn\'t generate routes. Please try again.'}
+    <div className="min-h-screen flex items-center justify-center p-4 bg-paper">
+      <div className="field-card max-w-md w-full px-7 py-7 text-center">
+        <p className="label-mono-sm !text-vermillion mb-2">— Survey failed</p>
+        <h1
+          className="font-display text-[26px] font-semibold text-ink leading-tight mb-2"
+          style={{ fontVariationSettings: '"SOFT" 100, "opsz" 48' }}
+        >
+          We couldn&apos;t plot your routes.
+        </h1>
+        <p className="text-[13px] text-ink-faded mb-5 font-mono">
+          {error.message || 'An unexpected error stopped the survey.'}
         </p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-2 justify-center">
           <button
             onClick={reset}
-            className="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
+            className="bg-vermillion text-paper px-5 py-2 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
           >
-            Try Again
+            Try again
           </button>
           <button
             onClick={() => router.push('/wizard')}
-            className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+            className="border border-hairline px-5 py-2 label-mono-sm hover:border-ink hover:text-ink transition-colors"
           >
-            Edit Preferences
+            Adjust survey
           </button>
         </div>
       </div>

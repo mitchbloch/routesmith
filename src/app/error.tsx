@@ -10,25 +10,35 @@ export default function RootError({
   reset: () => void;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="text-center max-w-md">
-        <div className="text-5xl mb-4">!</div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h1>
-        <p className="text-gray-500 mb-6">
-          {error.message || 'An unexpected error occurred.'}
+    <div className="min-h-screen flex items-center justify-center p-4 bg-paper">
+      <div className="field-card max-w-md w-full px-7 py-7 text-center relative">
+        <span className="absolute -top-px -left-px w-3 h-3 border-l border-t border-ink" aria-hidden />
+        <span className="absolute -top-px -right-px w-3 h-3 border-r border-t border-ink" aria-hidden />
+        <span className="absolute -bottom-px -left-px w-3 h-3 border-l border-b border-ink" aria-hidden />
+        <span className="absolute -bottom-px -right-px w-3 h-3 border-r border-b border-ink" aria-hidden />
+
+        <p className="label-mono-sm !text-vermillion mb-2">— Survey suspended</p>
+        <h1
+          className="font-display text-[28px] font-semibold text-ink leading-tight mb-2"
+          style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 48' }}
+        >
+          Something went wrong.
+        </h1>
+        <p className="text-[13px] text-ink-faded mb-5 font-mono">
+          {error.message || 'An unexpected error has interrupted the survey.'}
         </p>
-        <div className="flex gap-3 justify-center">
+        <div className="flex gap-2 justify-center">
           <button
             onClick={reset}
-            className="px-6 py-2.5 bg-blue-500 text-white rounded-xl font-medium hover:bg-blue-600 transition-colors"
+            className="bg-vermillion text-paper px-5 py-2 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
           >
-            Try Again
+            Try again
           </button>
           <Link
             href="/"
-            className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
+            className="border border-hairline px-5 py-2 label-mono-sm hover:border-ink hover:text-ink transition-colors"
           >
-            Go Home
+            Back to start
           </Link>
         </div>
       </div>

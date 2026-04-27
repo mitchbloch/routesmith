@@ -1,30 +1,25 @@
 import Nav from '@/components/Nav';
+import CompassRose from '@/components/ornament/CompassRose';
 
 export default function LibraryLoading() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Nav />
-      <div className="max-w-2xl mx-auto px-4 pt-20 pb-8">
-        <div className="h-7 w-40 bg-gray-200 rounded animate-pulse mb-6" />
-
-        {/* Filter bar placeholder */}
-        <div className="flex gap-2 mb-4">
-          <div className="h-9 w-60 bg-gray-200 rounded-lg animate-pulse" />
-          <div className="h-9 w-28 bg-gray-200 rounded-lg animate-pulse" />
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 pb-12">
+        <div className="mb-8">
+          <p className="label-mono-sm">Your fieldbook · saved routes</p>
+          <h1
+            className="font-display text-[40px] sm:text-[48px] font-semibold text-ink leading-[1.0] tracking-tight mt-1"
+            style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 96' }}
+          >
+            The library.
+          </h1>
         </div>
-
-        {/* Card placeholders */}
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-white rounded-xl p-4 border border-gray-200 space-y-2">
-              <div className="h-5 w-44 bg-gray-200 rounded animate-pulse" />
-              <div className="flex gap-3">
-                <div className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
-                <div className="h-4 w-16 bg-gray-100 rounded animate-pulse" />
-                <div className="h-4 w-32 bg-gray-100 rounded animate-pulse" />
-              </div>
-            </div>
-          ))}
+        <div className="text-center py-16">
+          <div className="text-ink mx-auto mb-4 w-fit">
+            <CompassRose size={40} spin />
+          </div>
+          <p className="label-mono-sm">Loading your fieldbook</p>
         </div>
       </div>
     </div>
