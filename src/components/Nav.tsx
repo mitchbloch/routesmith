@@ -13,7 +13,6 @@ export default function Nav() {
   const { user, loading } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [pendingNav, setPendingNav] = useState<string | null>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const handleLibraryClick = (e: React.MouseEvent) => {
     if (user) return; // let Link navigate
@@ -25,7 +24,6 @@ export default function Nav() {
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    setMenuOpen(false);
     router.refresh();
   };
 
@@ -45,32 +43,25 @@ export default function Nav() {
             </Link>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {loading ? null : user ? (
-              <div className="relative">
-                <button
-                  onClick={() => setMenuOpen((v) => !v)}
-                  className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+              <>
+                <span
+                  className="hidden sm:inline-flex items-center gap-2 text-sm text-gray-600 max-w-[200px]"
+                  title={user.email ?? undefined}
                 >
-                  <span className="hidden sm:inline max-w-[180px] truncate">{user.email}</span>
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-blue-700 text-xs font-semibold shrink-0">
                     {user.email?.[0]?.toUpperCase() ?? '?'}
                   </span>
+                  <span className="truncate">{user.email}</span>
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                >
+                  Sign out
                 </button>
-                {menuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setMenuOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg z-20">
-                      <button
-                        onClick={handleSignOut}
-                        className="block w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-gray-50"
-                      >
-                        Sign out
-                      </button>
-                    </div>
-                  </>
-                )}
-              </div>
+              </>
             ) : (
               <button
                 onClick={() => { setPendingNav(null); setModalOpen(true); }}
