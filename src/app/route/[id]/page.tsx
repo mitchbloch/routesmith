@@ -6,10 +6,12 @@ import { decompressFromEncodedURIComponent } from 'lz-string';
 import dynamic from 'next/dynamic';
 import Nav from '@/components/Nav';
 import ShareButton from '@/components/ShareButton';
+import SignInModal from '@/components/SignInModal';
 import StarRating from '@/components/StarRating';
 import type { GeneratedRoute, SavedRoute } from '@/lib/types';
 import { metersToMiles } from '@/lib/geometry';
 import { useRouteLibrary } from '@/hooks/useRouteLibrary';
+import { useAuth } from '@/lib/auth/useAuth';
 
 const MapWithRoute = dynamic(() => import('@/components/MapWithRoute'), { ssr: false });
 
@@ -30,10 +32,12 @@ export default function RouteDetailPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { routes: savedRoutes, save, update } = useRouteLibrary();
+  const { user } = useAuth();
   const [route, setRoute] = useState<GeneratedRoute | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [customName, setCustomName] = useState('');
   const [editing, setEditing] = useState(false);
+  const [signInOpen, setSignInOpen] = useState(false);
 
   useEffect(() => {
     // Try to load from compressed URL data
@@ -77,7 +81,7 @@ export default function RouteDetailPage() {
     }
   }, [route, savedRoutes]);
 
-  const handleSave = () => {
+  const persistRoute = () => {
     if (!route) return;
     const prefs = sessionStorage.getItem('routesmith_prefs');
     const activityType = prefs ? JSON.parse(prefs).activityType : 'running';
@@ -85,6 +89,15 @@ export default function RouteDetailPage() {
     save(route, activityType, startAddr);
     setIsSaved(true);
     setCustomName(route.name);
+  };
+
+  const handleSave = () => {
+    if (!route) return;
+    if (!user) {
+      setSignInOpen(true);
+      return;
+    }
+    persistRoute();
   };
 
   const handleRename = () => {
@@ -241,6 +254,13 @@ export default function RouteDetailPage() {
           </button>
         </div>
       </div>
+
+      <SignInModal
+        open={signInOpen}
+        onClose={() => setSignInOpen(false)}
+        onSuccess={persistRoute}
+        subtitle="Sign in to save this route to your library."
+      />
     </div>
   );
 }

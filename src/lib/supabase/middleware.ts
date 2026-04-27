@@ -1,8 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Routes that require authentication
-const PROTECTED_ROUTES = ["/wizard", "/results", "/library"];
+// Routes that require authentication. Auth is otherwise optional —
+// landing, wizard, results, and shared route view are public. See CLAUDE.md → Auth.
+const PROTECTED_ROUTES = ["/library"];
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -46,6 +47,7 @@ export async function updateSession(request: NextRequest) {
   if (!user && isProtected) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
+    url.searchParams.set("returnTo", pathname);
     return NextResponse.redirect(url);
   }
 

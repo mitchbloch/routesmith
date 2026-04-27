@@ -19,8 +19,18 @@
 
 ### 1.3 Auth Flow
 - [x] Create `src/app/login/page.tsx` (email/password login)
-- [x] Verified: /wizard and /library redirect to /login when unauthenticated
+- [x] ~~Verified: /wizard and /library redirect to /login when unauthenticated~~ — superseded by 1.9 (optional auth)
 - [ ] Update `src/app/layout.tsx` (auth provider — not yet needed, middleware handles session)
+
+### 1.9 Optional Auth (post-MVP correction — aligns code with PRD)
+- [x] Drop `/wizard` and `/results` from `PROTECTED_ROUTES` in `src/lib/supabase/middleware.ts`. Keep only `/library`.
+- [x] Add `src/lib/auth/useAuth.ts` (client hook: `{ user, loading }` via `getUser()` + `onAuthStateChange`).
+- [x] Add `src/components/SignInModal.tsx` (inline modal with Sign in / Sign up tabs, `onSuccess` callback).
+- [x] Update `src/components/Nav.tsx` with right-side Sign-in / profile menu; anon Library click opens modal.
+- [x] Update `src/app/route/[id]/page.tsx`: anon Save opens modal, on auth success fires save.
+- [x] Soften `src/app/login/page.tsx` copy and honor `?returnTo=`.
+- [x] Smoke test: `npm run build` clean.
+- [ ] Manual E2E: anon flow → generate → save → modal → sign in → saved.
 
 ### 1.4 Data Access Layer
 - [x] Create `src/lib/routes.ts` (DAL: CRUD, row converters, batch import)

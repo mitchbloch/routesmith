@@ -44,10 +44,11 @@ Supabase project ID: `oqmlrkogthnjncqexwby` | Mapbox account: `mbloch`
 
 ### Auth
 
-- Supabase email/password auth
-- Middleware protects `/wizard`, `/results`, `/library` — redirects to `/login`
-- Public routes: `/` (landing), `/route/[id]` (shared routes)
-- Profile auto-created via database trigger on user signup
+- Supabase email/password auth, **optional** — landing, wizard, results, and shared route view are all public.
+- Middleware protects only `/library` (saved routes are user-owned). Everything else is anon-accessible.
+- Sign-in surface is passive: a "Sign in" button in `Nav.tsx`, plus a `SignInModal` that pops on Save (anon click) and on Library link (anon click). Modal accepts an `onSuccess` callback so the original action (save / navigate) fires immediately after auth.
+- `/api/routes` POST/PATCH/DELETE return 401 for anon — `useRouteLibrary` swallows the read 401 silently; save path is gated client-side by the modal.
+- Profile auto-created via database trigger on user signup.
 
 ### Route Generation Flow
 

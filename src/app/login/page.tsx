@@ -1,15 +1,20 @@
 "use client";
 
 import { createClient } from "@/lib/supabase/client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Only allow same-origin paths to prevent open-redirect via ?returnTo=
+  const rawReturn = searchParams.get("returnTo");
+  const returnTo = rawReturn && rawReturn.startsWith("/") && !rawReturn.startsWith("//") ? rawReturn : "/";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +33,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
+    router.push(returnTo);
     router.refresh();
   }
 
@@ -39,7 +44,7 @@ export default function LoginPage() {
           Routesmith
         </h1>
         <p className="mb-8 text-center text-gray-600">
-          Sign in to generate routes
+          Sign in to save routes and access your library
         </p>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -53,6 +58,7 @@ export default function LoginPage() {
             <input
               id="email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -70,6 +76,7 @@ export default function LoginPage() {
             <input
               id="password"
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -89,7 +96,19 @@ export default function LoginPage() {
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
+
+        <p className="mt-6 text-center text-sm text-gray-500">
+          You can browse and generate routes without signing in.
+        </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
   );
 }
