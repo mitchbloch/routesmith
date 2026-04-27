@@ -12,8 +12,7 @@ interface RouteCardProps {
 }
 
 function formatDistance(meters: number): string {
-  const miles = metersToMiles(meters);
-  return `${miles.toFixed(1)} mi`;
+  return `${metersToMiles(meters).toFixed(1)} mi`;
 }
 
 function formatDuration(seconds: number): string {
@@ -25,54 +24,81 @@ function formatDuration(seconds: number): string {
 }
 
 function formatElevation(meters: number): string {
-  const feet = Math.round(meters * 3.281);
-  return `${feet} ft`;
+  return `${Math.round(meters * 3.281)} ft`;
 }
 
 export default function RouteCard({ route, rank, selected, onClick }: RouteCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+      className={`relative w-full text-left transition-all overflow-hidden border ${
         selected
-          ? 'border-blue-500 bg-blue-50 shadow-md'
-          : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-sm'
+          ? 'border-ink bg-paper-deep'
+          : 'border-hairline bg-paper hover:border-ink-faded'
       }`}
     >
-      <div className="flex items-start gap-3">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold shrink-0"
-          style={{ backgroundColor: route.color }}
+      {/* Route signature color stripe */}
+      <span
+        aria-hidden
+        className="absolute left-0 top-0 bottom-0 w-[3px]"
+        style={{ backgroundColor: route.color }}
+      />
+
+      {/* Selected stamp */}
+      {selected && (
+        <span
+          aria-hidden
+          className="absolute top-2 right-2 label-mono-sm !text-vermillion"
         >
-          {rank}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900 truncate">{route.name}</h3>
-            <span className="text-sm font-medium text-blue-600 shrink-0 ml-2">
-              {route.score.overall}/100
-            </span>
-          </div>
+          ●
+        </span>
+      )}
 
-          <div className="flex gap-4 mt-2 text-sm text-gray-500">
-            <span>{formatDistance(route.distance)}</span>
-            <span>{formatDuration(route.duration)}</span>
-            <span>+{formatElevation(route.elevationGain)}</span>
-          </div>
-
-          {route.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mt-2">
-              {route.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-600"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
+      <div className="pl-5 pr-4 py-4">
+        <div className="flex items-baseline gap-3 mb-1.5">
+          <span
+            className="font-display text-[28px] leading-none font-semibold text-ink tabular-nums"
+            style={{ fontVariationSettings: '"SOFT" 30, "opsz" 60' }}
+          >
+            {String(rank).padStart(2, '0')}
+          </span>
+          <span className="label-mono-sm">— Plate</span>
         </div>
+
+        <h3
+          className="font-display text-[18px] leading-snug font-medium text-ink truncate mb-1"
+          style={{ fontVariationSettings: '"SOFT" 50, "opsz" 24' }}
+          title={route.name}
+        >
+          {route.name}
+        </h3>
+
+        <div className="flex items-baseline gap-3 mb-3">
+          <span className="coord-mono text-ink">
+            <span className="text-ink font-semibold">{route.score.overall}</span>
+            <span className="text-ink-ghost">/100</span>
+          </span>
+          <span className="label-mono-sm">match</span>
+        </div>
+
+        <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 coord-mono">
+          <span><span className="label-mono-sm mr-1">D</span>{formatDistance(route.distance)}</span>
+          <span><span className="label-mono-sm mr-1">T</span>{formatDuration(route.duration)}</span>
+          <span><span className="label-mono-sm mr-1">↑</span>{formatElevation(route.elevationGain)}</span>
+        </div>
+
+        {route.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {route.tags.map((tag) => (
+              <span
+                key={tag}
+                className="px-2 py-0.5 label-mono-sm border border-hairline-soft"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </button>
   );

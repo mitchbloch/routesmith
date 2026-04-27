@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import RouteCard from '@/components/RouteCard';
 import Nav from '@/components/Nav';
+import CompassRose from '@/components/ornament/CompassRose';
 import type { GeneratedRoute, UserPreferences } from '@/lib/types';
 
 const MapWithRoute = dynamic(() => import('@/components/MapWithRoute'), { ssr: false });
@@ -74,34 +75,47 @@ export default function ResultsPage() {
       <Nav />
 
       {loading && (
-        <div className="flex-1 flex items-center justify-center pt-14">
+        <div className="flex-1 flex items-center justify-center pt-14 bg-paper">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-lg font-medium text-gray-700">Generating your routes...</p>
-            <p className="text-sm text-gray-400 mt-1">Finding the best paths for you</p>
+            <div className="text-ink mx-auto mb-5 w-fit">
+              <CompassRose size={56} spin />
+            </div>
+            <p className="font-display text-[20px] text-ink leading-tight"
+               style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}>
+              Plotting your routes…
+            </p>
+            <p className="label-mono-sm mt-2">Surveying paths · scoring corridors</p>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="flex-1 flex items-center justify-center pt-14">
-          <div className="text-center p-8">
-            <p className="text-lg font-medium text-red-600 mb-2">Something went wrong</p>
-            <p className="text-gray-500 mb-4">{error}</p>
+        <div className="flex-1 flex items-center justify-center pt-14 bg-paper">
+          <div className="field-card max-w-sm mx-4 px-6 py-6 text-center">
+            <p className="label-mono-sm !text-vermillion mb-2">— Survey failed</p>
+            <p className="font-display text-[20px] text-ink mb-2"
+               style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}>
+              We couldn&apos;t plot routes here.
+            </p>
+            <p className="text-[13px] text-ink-faded mb-4">{error}</p>
             <button
               onClick={() => router.push('/wizard')}
-              className="px-6 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+              className="bg-vermillion text-paper px-5 py-2 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
             >
-              Try Again
+              Adjust survey
             </button>
           </div>
         </div>
       )}
 
       {!loading && !error && (
-        <div className="flex-1 flex flex-col lg:flex-row pt-14">
+        <div className="flex-1 flex flex-col lg:flex-row pt-14 bg-paper">
           {/* Map */}
-          <div className="h-[35vh] sm:h-[40vh] lg:h-full lg:flex-1">
+          <div className="h-[35vh] sm:h-[40vh] lg:h-full lg:flex-1 relative">
+            <span className="absolute top-2 left-2 w-3 h-3 border-l border-t border-ink z-10 pointer-events-none" aria-hidden />
+            <span className="absolute top-2 right-2 w-3 h-3 border-r border-t border-ink z-10 pointer-events-none" aria-hidden />
+            <span className="absolute bottom-2 left-2 w-3 h-3 border-l border-b border-ink z-10 pointer-events-none" aria-hidden />
+            <span className="absolute bottom-2 right-2 w-3 h-3 border-r border-b border-ink z-10 pointer-events-none" aria-hidden />
             <MapWithRoute
               routes={routes}
               selectedRouteId={selectedId}
@@ -111,12 +125,18 @@ export default function ResultsPage() {
           </div>
 
           {/* Route cards */}
-          <div className="flex-1 lg:w-96 lg:flex-none overflow-y-auto p-4 pb-20 lg:pb-4 space-y-3">
-            <h2 className="text-lg font-semibold text-gray-900 mb-1">
-              {routes.length} Routes Found
-            </h2>
+          <div className="flex-1 lg:w-[420px] lg:flex-none overflow-y-auto p-4 pb-20 lg:pb-4 space-y-3 lg:border-l lg:border-hairline">
+            <div className="mb-3">
+              <p className="label-mono-sm">Survey complete · {routes.length} candidate{routes.length === 1 ? '' : 's'}</p>
+              <h2
+                className="font-display text-[24px] font-semibold text-ink leading-tight"
+                style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}
+              >
+                Choose your line.
+              </h2>
+            </div>
             {routes.map((route, i) => (
-              <div key={route.id} onClick={() => handleViewDetail(route)} className="cursor-pointer">
+              <div key={route.id} onClick={() => handleViewDetail(route)} className="cursor-pointer ink-rise" style={{ animationDelay: `${i * 60}ms` }}>
                 <RouteCard
                   route={route}
                   rank={i + 1}
@@ -126,13 +146,14 @@ export default function ResultsPage() {
               </div>
             ))}
             {routes.length === 0 && (
-              <div className="text-center py-8">
-                <p className="text-gray-500">No routes found. Try adjusting your preferences.</p>
+              <div className="field-card px-5 py-6 text-center">
+                <p className="label-mono-sm mb-2">— No routes</p>
+                <p className="text-[14px] text-ink-faded mb-4">Try adjusting your preferences.</p>
                 <button
                   onClick={() => router.push('/wizard')}
-                  className="mt-3 px-6 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+                  className="bg-vermillion text-paper px-5 py-2 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
                 >
-                  Edit Preferences
+                  Adjust survey
                 </button>
               </div>
             )}

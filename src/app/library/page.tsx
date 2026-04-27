@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Nav from '@/components/Nav';
 import StarRating from '@/components/StarRating';
+import CompassRose from '@/components/ornament/CompassRose';
 import { useRouteLibrary } from '@/hooks/useRouteLibrary';
 import { metersToMiles } from '@/lib/geometry';
 import type { ActivityType, SavedRoute } from '@/lib/types';
@@ -34,93 +35,129 @@ export default function LibraryPage() {
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (confirm('Delete this route?')) {
+    if (confirm('Remove this route from your fieldbook?')) {
       remove(id);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-paper">
       <Nav />
 
-      <div className="max-w-2xl mx-auto px-4 pt-20 pb-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Route Library</h1>
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 pb-12">
+        {/* Masthead */}
+        <div className="mb-8 ink-rise">
+          <p className="label-mono-sm">Your fieldbook · saved routes</p>
+          <h1
+            className="font-display text-[40px] sm:text-[48px] font-semibold text-ink leading-[1.0] tracking-tight mt-1"
+            style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 96' }}
+          >
+            The library.
+          </h1>
+        </div>
 
         {!hydrated ? (
-          <div className="text-center py-12">
-            <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto" />
+          <div className="text-center py-16">
+            <div className="text-ink mx-auto mb-4 w-fit">
+              <CompassRose size={40} spin />
+            </div>
+            <p className="label-mono-sm">Loading your fieldbook</p>
           </div>
         ) : routes.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500 mb-4">No saved routes yet</p>
+          <div className="field-card px-7 py-10 text-center">
+            <div className="text-ink-faded mx-auto mb-3 w-fit">
+              <CompassRose size={32} />
+            </div>
+            <p className="label-mono-sm mb-2">— No entries yet</p>
+            <p className="font-display text-[20px] text-ink mb-5"
+               style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}>
+              Your fieldbook is empty.
+            </p>
             <button
               onClick={() => router.push('/')}
-              className="px-6 py-2 bg-blue-500 text-white rounded-xl hover:bg-blue-600"
+              className="bg-vermillion text-paper px-5 py-2.5 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
             >
-              Generate Your First Route
+              Plot your first route
             </button>
           </div>
         ) : (
           <>
             {/* Filters */}
-            <div className="flex flex-wrap gap-2 mb-4">
-              <div className="flex gap-1 bg-white rounded-lg p-1 border border-gray-200">
-                {(['all', 'walking', 'running', 'biking'] as const).map((act) => (
+            <div className="flex flex-wrap gap-3 items-center mb-5 pb-4 border-b border-hairline">
+              <div className="inline-flex border border-hairline">
+                {(['all', 'walking', 'running', 'biking'] as const).map((act, i) => (
                   <button
                     key={act}
                     onClick={() => setFilterActivity(act)}
-                    className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                      filterActivity === act ? 'bg-blue-500 text-white' : 'text-gray-600 hover:bg-gray-50'
-                    }`}
+                    className={`label-mono-sm px-3 py-1.5 transition-colors ${
+                      filterActivity === act ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
+                    } ${i > 0 ? 'border-l border-hairline' : ''}`}
                   >
-                    {act === 'all' ? 'All' : act.charAt(0).toUpperCase() + act.slice(1)}
+                    {act === 'all' ? 'All' : act}
                   </button>
                 ))}
               </div>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as SortBy)}
-                className="px-3 py-1.5 rounded-lg border border-gray-200 text-sm bg-white"
-              >
-                <option value="newest">Newest</option>
-                <option value="rating">Highest rated</option>
-                <option value="distance">Longest</option>
-              </select>
+              <div className="inline-flex items-center gap-2">
+                <span className="label-mono-sm">Sort</span>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortBy)}
+                  className="bg-transparent border border-hairline px-2.5 py-1.5 label-mono-sm text-ink focus:border-ink outline-none cursor-pointer"
+                >
+                  <option value="newest">Newest</option>
+                  <option value="rating">Rating</option>
+                  <option value="distance">Distance</option>
+                </select>
+              </div>
+              <span className="ml-auto coord-mono text-ink-faded">
+                {String(filtered.length).padStart(3, '0')} entr{filtered.length === 1 ? 'y' : 'ies'}
+              </span>
             </div>
 
             {/* Route list */}
-            <div className="space-y-3">
-              {filtered.map((route) => (
+            <div className="space-y-2">
+              {filtered.map((route, i) => (
                 <div
                   key={route.id}
                   onClick={() => handleView(route)}
-                  className="bg-white rounded-xl p-4 border border-gray-200 hover:border-gray-300 hover:shadow-sm cursor-pointer transition-all"
+                  className="relative bg-paper border border-hairline hover:border-ink-faded transition-colors cursor-pointer ink-rise"
+                  style={{ animationDelay: `${i * 40}ms` }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h3 className="font-semibold text-gray-900">
+                  <div className="px-5 py-4 flex items-start gap-4">
+                    <span
+                      className="font-display text-[26px] leading-none font-semibold text-ink-faded tabular-nums shrink-0 mt-0.5"
+                      style={{ fontVariationSettings: '"SOFT" 30, "opsz" 60' }}
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <h3
+                        className="font-display text-[18px] font-medium text-ink leading-snug truncate"
+                        style={{ fontVariationSettings: '"SOFT" 50, "opsz" 24' }}
+                      >
                         {route.customName || route.name}
                       </h3>
-                      <div className="flex gap-3 mt-1 text-sm text-gray-500">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 coord-mono text-ink-soft">
                         <span>{metersToMiles(route.distance).toFixed(1)} mi</span>
-                        <span>{route.activityType}</span>
+                        <span className="label-mono-sm">{route.activityType}</span>
                         {route.startAddress && (
-                          <span className="truncate max-w-[200px]">{route.startAddress}</span>
+                          <span className="truncate max-w-[260px]">{route.startAddress}</span>
                         )}
                       </div>
                       {route.rating && route.rating > 0 && (
-                        <div className="mt-1">
+                        <div className="mt-2">
                           <StarRating rating={route.rating} size="sm" />
                         </div>
                       )}
                     </div>
                     <button
                       onClick={(e) => handleDelete(e, route.id)}
-                      className="text-gray-400 hover:text-red-500 p-1"
-                      title="Delete"
+                      className="text-ink-ghost hover:text-vermillion transition-colors p-1 shrink-0"
+                      title="Remove from fieldbook"
+                      aria-label="Delete"
                     >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
                     </button>
                   </div>
@@ -129,7 +166,7 @@ export default function LibraryPage() {
             </div>
 
             {filtered.length === 0 && (
-              <p className="text-center text-gray-400 py-8">No routes match this filter</p>
+              <p className="text-center label-mono-sm py-10">No entries match this filter.</p>
             )}
           </>
         )}
