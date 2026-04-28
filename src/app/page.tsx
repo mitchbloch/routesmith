@@ -4,8 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Nav from '@/components/Nav';
-import Coordinate from '@/components/ornament/Coordinate';
-import CompassRose from '@/components/ornament/CompassRose';
 import { reverseGeocode } from '@/lib/geocoding';
 import { useGeolocation } from '@/hooks/useGeolocation';
 
@@ -43,10 +41,8 @@ export default function Home() {
         <Nav />
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center">
-            <div className="text-ink mx-auto mb-5 w-fit">
-              <CompassRose size={56} spin />
-            </div>
-            <p className="label-mono">Locating · finding your bearings</p>
+            <div className="w-6 h-6 border-2 border-hairline border-t-vermillion rounded-full compass-spin mx-auto mb-3" />
+            <p className="text-[12px] text-ink-faded">Locating</p>
           </div>
         </div>
       </div>
@@ -69,82 +65,32 @@ export default function Home() {
         className="w-full h-full"
       />
 
-      {/* Masthead — sits below nav, above search */}
-      <div className="absolute top-16 left-0 right-0 z-10 px-5 pointer-events-none">
-        <div className="max-w-lg mx-auto text-center ink-rise">
-          <p className="label-mono-sm mb-1" style={{ animationDelay: '50ms' }}>Plate I · Personal cartography</p>
-          <h1
-            className="font-display text-[44px] sm:text-[52px] leading-[0.95] font-semibold text-ink tracking-tight"
-            style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 144', animationDelay: '100ms' }}
-          >
-            A fieldbook
-            <span className="block italic text-ink-soft" style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 144' }}> of routes.</span>
-          </h1>
-        </div>
-      </div>
-
-      {/* Search overlay */}
-      <div className="absolute top-[200px] sm:top-[220px] left-4 right-4 z-10 max-w-lg mx-auto ink-rise" style={{ animationDelay: '180ms' }}>
+      {/* Search — floats over map, top-left under nav */}
+      <div className="absolute top-16 left-4 right-4 sm:left-6 sm:right-auto z-10 sm:w-[400px] ink-rise">
         <AddressSearch
           onResult={(lat, lng, address) => handleLocationSelect(lat, lng, address)}
-          placeholder="Search for an address, or tap the map…"
+          placeholder="Search an address, or tap the map"
           proximity={proximity}
         />
       </div>
 
-      {/* CTA — Logbook Entry card */}
+      {/* Start point card — floats bottom-left when chosen */}
       {location && (
-        <div className="absolute bottom-6 left-4 right-4 z-10 max-w-lg mx-auto ink-rise">
-          <div className="field-card relative">
-            {/* Corner crosshairs */}
-            <span className="absolute -top-px -left-px w-3 h-3 border-l border-t border-ink" aria-hidden />
-            <span className="absolute -top-px -right-px w-3 h-3 border-r border-t border-ink" aria-hidden />
-            <span className="absolute -bottom-px -left-px w-3 h-3 border-l border-b border-ink" aria-hidden />
-            <span className="absolute -bottom-px -right-px w-3 h-3 border-r border-b border-ink" aria-hidden />
-
-            <div className="px-5 pt-4 pb-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="label-mono-sm">Logbook entry · start point</span>
-                <span className="coord-mono text-ink-faded">№01</span>
-              </div>
-
-              {location.address ? (
-                <p className="font-display text-[18px] leading-tight text-ink mb-1 truncate" title={location.address}
-                   style={{ fontVariationSettings: '"SOFT" 50, "opsz" 24' }}>
-                  {location.address}
-                </p>
-              ) : (
-                <p className="font-display text-[18px] leading-tight text-ink-faded italic mb-1">
-                  Resolving address…
-                </p>
-              )}
-
-              <Coordinate lat={location.lat} lng={location.lng} className="block mb-4" />
+        <div className="absolute bottom-4 left-4 right-4 sm:left-6 sm:right-auto z-10 sm:w-[400px] ink-rise">
+          <div className="field-card">
+            <div className="px-4 pt-3 pb-3">
+              <p className="text-[12px] font-medium text-ink-faded mb-1">Start</p>
+              <p className="text-[14px] leading-snug text-ink mb-3 truncate" title={location.address}>
+                {location.address ?? <span className="text-ink-faded italic">Resolving address…</span>}
+              </p>
 
               <button
                 onClick={handleGenerate}
-                className="w-full group flex items-center justify-between bg-vermillion hover:bg-vermillion-deep text-paper px-5 py-3 transition-colors"
+                className="w-full flex items-center justify-between bg-vermillion hover:bg-vermillion-deep text-white px-4 py-2.5 transition-colors text-[13px] font-medium"
               >
-                <span className="label-mono-sm !text-paper">Plot a route</span>
-                <span className="font-mono text-[13px] text-paper/80 group-hover:translate-x-0.5 transition-transform">→</span>
+                <span>Plot a route</span>
+                <span aria-hidden>→</span>
               </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Hint */}
-      {!location && (
-        <div className="absolute bottom-6 left-4 right-4 z-10 max-w-lg mx-auto ink-rise" style={{ animationDelay: '240ms' }}>
-          <div className="field-card px-5 py-4">
-            <div className="flex items-start gap-3">
-              <span className="text-ink-faded mt-0.5"><CompassRose size={18} /></span>
-              <div className="flex-1">
-                <p className="label-mono-sm mb-1">Awaiting bearings</p>
-                <p className="font-display text-[15px] text-ink-soft leading-snug">
-                  Search for a place, or tap a point on the map to set your start.
-                </p>
-              </div>
             </div>
           </div>
         </div>

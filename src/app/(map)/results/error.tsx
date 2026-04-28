@@ -1,23 +1,25 @@
 'use client';
 
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
-export default function RootError({
+export default function ResultsError({
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const router = useRouter();
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-paper">
-      <div className="field-card max-w-md w-full px-7 py-7 text-center">
+    <div className="p-4 pb-20">
+      <div className="field-card px-5 py-6 text-center mt-4">
         <p className="text-[12px] text-vermillion font-medium mb-2">Something went wrong</p>
-        <h1 className="text-[22px] font-semibold text-ink leading-tight mb-2 tracking-tight">
-          An unexpected error occurred.
-        </h1>
+        <p className="text-[16px] font-semibold text-ink mb-2 leading-tight">
+          We couldn&apos;t plot your routes.
+        </p>
         <p className="text-[13px] text-ink-faded mb-5">
-          {error.message || 'Please try again.'}
+          {error.message || 'An unexpected error stopped the generation.'}
         </p>
         <div className="flex gap-2 justify-center">
           <button
@@ -26,12 +28,12 @@ export default function RootError({
           >
             Try again
           </button>
-          <Link
-            href="/"
+          <button
+            onClick={() => router.push('/wizard')}
             className="border border-hairline px-5 py-2 text-[13px] font-medium text-ink-faded hover:border-ink hover:text-ink transition-colors"
           >
-            Back to start
-          </Link>
+            Adjust preferences
+          </button>
         </div>
       </div>
     </div>

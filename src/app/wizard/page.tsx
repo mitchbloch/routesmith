@@ -161,11 +161,6 @@ export default function WizardPage() {
               proximity={startCenter}
             />
             <div className="h-[320px] overflow-hidden border border-hairline relative">
-              {/* Corner crosshairs to give the map plate a cartographic frame */}
-              <span className="absolute top-0 left-0 w-3 h-3 border-l border-t border-ink z-10 pointer-events-none" aria-hidden />
-              <span className="absolute top-0 right-0 w-3 h-3 border-r border-t border-ink z-10 pointer-events-none" aria-hidden />
-              <span className="absolute bottom-0 left-0 w-3 h-3 border-l border-b border-ink z-10 pointer-events-none" aria-hidden />
-              <span className="absolute bottom-0 right-0 w-3 h-3 border-r border-b border-ink z-10 pointer-events-none" aria-hidden />
               <Map
                 onLocationSelect={(lat, lng) => handleEndLocationSelect(lat, lng)}
                 center={startCenter}
@@ -174,8 +169,8 @@ export default function WizardPage() {
               />
             </div>
             {endLocation?.address && (
-              <p className="coord-mono text-ink-soft truncate" title={endLocation.address}>
-                <span className="label-mono-sm mr-2">→</span>{endLocation.address}
+              <p className="text-[13px] text-ink-soft truncate" title={endLocation.address}>
+                <span className="text-ink-faded mr-2">→</span>{endLocation.address}
               </p>
             )}
           </div>

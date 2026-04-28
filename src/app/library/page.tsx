@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Nav from '@/components/Nav';
 import StarRating from '@/components/StarRating';
-import CompassRose from '@/components/ornament/CompassRose';
 import { useRouteLibrary } from '@/hooks/useRouteLibrary';
 import { metersToMiles } from '@/lib/geometry';
 import type { ActivityType, SavedRoute } from '@/lib/types';
@@ -35,7 +34,7 @@ export default function LibraryPage() {
 
   const handleDelete = (e: React.MouseEvent, id: string) => {
     e.stopPropagation();
-    if (confirm('Remove this route from your fieldbook?')) {
+    if (confirm('Remove this route from your library?')) {
       remove(id);
     }
   };
@@ -44,38 +43,29 @@ export default function LibraryPage() {
     <div className="min-h-screen bg-paper">
       <Nav />
 
-      <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-20 pb-12">
-        {/* Masthead */}
-        <div className="mb-8 ink-rise">
-          <p className="label-mono-sm">Your fieldbook · saved routes</p>
-          <h1
-            className="font-display text-[40px] sm:text-[48px] font-semibold text-ink leading-[1.0] tracking-tight mt-1"
-            style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 96' }}
-          >
-            The library.
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 pt-16 sm:pt-20 pb-12">
+        {/* Header */}
+        <div className="mb-7">
+          <p className="text-[12px] text-ink-faded mb-1">Saved routes</p>
+          <h1 className="text-[32px] sm:text-[40px] font-semibold text-ink leading-tight tracking-tight">
+            Library
           </h1>
         </div>
 
         {!hydrated ? (
           <div className="text-center py-16">
-            <div className="text-ink mx-auto mb-4 w-fit">
-              <CompassRose size={40} spin />
-            </div>
-            <p className="label-mono-sm">Loading your fieldbook</p>
+            <div className="w-7 h-7 border-2 border-hairline border-t-vermillion rounded-full compass-spin mx-auto mb-3" />
+            <p className="text-[12px] text-ink-faded">Loading</p>
           </div>
         ) : routes.length === 0 ? (
           <div className="field-card px-7 py-10 text-center">
-            <div className="text-ink-faded mx-auto mb-3 w-fit">
-              <CompassRose size={32} />
-            </div>
-            <p className="label-mono-sm mb-2">— No entries yet</p>
-            <p className="font-display text-[20px] text-ink mb-5"
-               style={{ fontVariationSettings: '"SOFT" 100, "opsz" 36' }}>
-              Your fieldbook is empty.
+            <p className="text-[12px] text-ink-faded mb-1">No entries yet</p>
+            <p className="text-[18px] font-semibold text-ink mb-5 leading-tight">
+              Your library is empty.
             </p>
             <button
               onClick={() => router.push('/')}
-              className="bg-vermillion text-paper px-5 py-2.5 label-mono-sm !text-paper hover:bg-vermillion-deep transition-colors"
+              className="bg-vermillion text-white px-5 py-2.5 text-[13px] font-medium hover:bg-vermillion-deep transition-colors"
             >
               Plot your first route
             </button>
@@ -89,59 +79,53 @@ export default function LibraryPage() {
                   <button
                     key={act}
                     onClick={() => setFilterActivity(act)}
-                    className={`label-mono-sm px-3 py-1.5 transition-colors ${
+                    className={`text-[13px] font-medium px-3 py-1.5 transition-colors ${
                       filterActivity === act ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
                     } ${i > 0 ? 'border-l border-hairline' : ''}`}
                   >
-                    {act === 'all' ? 'All' : act}
+                    {act === 'all' ? 'All' : act.charAt(0).toUpperCase() + act.slice(1)}
                   </button>
                 ))}
               </div>
               <div className="inline-flex items-center gap-2">
-                <span className="label-mono-sm">Sort</span>
+                <span className="text-[12px] text-ink-faded">Sort</span>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortBy)}
-                  className="bg-transparent border border-hairline px-2.5 py-1.5 label-mono-sm text-ink focus:border-ink outline-none cursor-pointer"
+                  className="bg-transparent border border-hairline px-2.5 py-1.5 text-[13px] text-ink focus:border-ink outline-none cursor-pointer"
                 >
                   <option value="newest">Newest</option>
                   <option value="rating">Rating</option>
                   <option value="distance">Distance</option>
                 </select>
               </div>
-              <span className="ml-auto coord-mono text-ink-faded">
-                {String(filtered.length).padStart(3, '0')} entr{filtered.length === 1 ? 'y' : 'ies'}
+              <span className="ml-auto text-[12px] text-ink-faded">
+                {filtered.length} {filtered.length === 1 ? 'route' : 'routes'}
               </span>
             </div>
 
             {/* Route list */}
             <div className="space-y-2">
-              {filtered.map((route, i) => (
+              {filtered.map((route) => (
                 <div
                   key={route.id}
                   onClick={() => handleView(route)}
-                  className="relative bg-paper border border-hairline hover:border-ink-faded transition-colors cursor-pointer ink-rise"
-                  style={{ animationDelay: `${i * 40}ms` }}
+                  className="relative bg-paper border border-hairline hover:border-ink-faded transition-colors cursor-pointer"
                 >
                   <div className="px-5 py-4 flex items-start gap-4">
-                    <span
-                      className="font-display text-[26px] leading-none font-semibold text-ink-faded tabular-nums shrink-0 mt-0.5"
-                      style={{ fontVariationSettings: '"SOFT" 30, "opsz" 60' }}
-                    >
-                      {String(i + 1).padStart(2, '0')}
-                    </span>
                     <div className="flex-1 min-w-0">
-                      <h3
-                        className="font-display text-[18px] font-medium text-ink leading-snug truncate"
-                        style={{ fontVariationSettings: '"SOFT" 50, "opsz" 24' }}
-                      >
+                      <h3 className="text-[16px] font-medium text-ink leading-snug truncate">
                         {route.customName || route.name}
                       </h3>
-                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 coord-mono text-ink-soft">
+                      <div className="flex flex-wrap gap-x-3 gap-y-1 mt-1 text-[13px] tabular-nums text-ink-soft">
                         <span>{metersToMiles(route.distance).toFixed(1)} mi</span>
-                        <span className="label-mono-sm">{route.activityType}</span>
+                        <span className="text-ink-ghost">·</span>
+                        <span className="text-ink-faded">{route.activityType}</span>
                         {route.startAddress && (
-                          <span className="truncate max-w-[260px]">{route.startAddress}</span>
+                          <>
+                            <span className="text-ink-ghost">·</span>
+                            <span className="truncate max-w-[240px]">{route.startAddress}</span>
+                          </>
                         )}
                       </div>
                       {route.rating && route.rating > 0 && (
@@ -153,7 +137,7 @@ export default function LibraryPage() {
                     <button
                       onClick={(e) => handleDelete(e, route.id)}
                       className="text-ink-ghost hover:text-vermillion transition-colors p-1 shrink-0"
-                      title="Remove from fieldbook"
+                      title="Remove from library"
                       aria-label="Delete"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -166,7 +150,7 @@ export default function LibraryPage() {
             </div>
 
             {filtered.length === 0 && (
-              <p className="text-center label-mono-sm py-10">No entries match this filter.</p>
+              <p className="text-center text-[13px] text-ink-faded py-10">No routes match this filter.</p>
             )}
           </>
         )}
