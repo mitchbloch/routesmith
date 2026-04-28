@@ -69,35 +69,24 @@ export default function OptionSelector(props: OptionSelectorProps) {
       className="grid gap-2"
       style={{ gridTemplateColumns: `repeat(${columns}, 1fr)` }}
     >
-      {options.map((opt, i) => {
+      {options.map((opt) => {
         const selected = isSelected(opt.value);
         return (
           <button
             key={opt.value}
             onClick={() => handleClick(opt.value)}
-            className={`relative p-4 border text-left transition-all group ${
+            className={`relative px-4 py-3.5 border text-left transition-colors ${
               selected
-                ? 'border-ink bg-paper-deep'
-                : 'border-hairline bg-paper hover:border-ink-faded hover:bg-paper-deep/50'
+                ? 'border-vermillion bg-vermillion/5'
+                : 'border-hairline bg-paper hover:border-ink-faded'
             }`}
           >
-            {/* Selected stamp — vermillion checkmark in top-right corner */}
-            {selected && (
-              <span className="absolute top-2 right-2 label-mono-sm !text-vermillion">●</span>
-            )}
-
             <div className="flex items-center gap-3">
-              {opt.icon && <span className="text-2xl shrink-0">{opt.icon}</span>}
+              {opt.icon && <span className="text-xl shrink-0">{opt.icon}</span>}
               <div className="flex-1 min-w-0">
-                <div className="flex items-baseline gap-2">
-                  <span className="label-mono-sm shrink-0">{String(i + 1).padStart(2, '0')}</span>
-                  <p
-                    className="font-display text-[16px] font-medium text-ink"
-                    style={{ fontVariationSettings: '"SOFT" 50, "opsz" 18' }}
-                  >
-                    {opt.label}
-                  </p>
-                </div>
+                <p className={`text-[15px] font-medium leading-tight ${selected ? 'text-vermillion' : 'text-ink'}`}>
+                  {opt.label}
+                </p>
                 {opt.description && (
                   <p className="text-[13px] text-ink-faded mt-1 leading-snug">{opt.description}</p>
                 )}

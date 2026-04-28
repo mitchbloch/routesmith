@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
-import CompassRose from "@/components/ornament/CompassRose";
 
 function LoginForm() {
   const [email, setEmail] = useState("");
@@ -36,24 +35,14 @@ function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-paper px-4">
-      <div className="field-card w-full max-w-sm relative ink-rise">
-        {/* Corner crosshairs */}
-        <span className="absolute -top-px -left-px w-3 h-3 border-l border-t border-ink" aria-hidden />
-        <span className="absolute -top-px -right-px w-3 h-3 border-r border-t border-ink" aria-hidden />
-        <span className="absolute -bottom-px -left-px w-3 h-3 border-l border-b border-ink" aria-hidden />
-        <span className="absolute -bottom-px -right-px w-3 h-3 border-r border-b border-ink" aria-hidden />
-
+      <div className="field-card w-full max-w-sm">
         <div className="px-7 pt-7 pb-7">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-ink"><CompassRose size={16} /></span>
-            <span className="label-mono-sm">Routesmith</span>
+          <div className="mb-3">
+            <span className="text-[13px] font-semibold tracking-tight text-ink">Routesmith</span>
           </div>
 
-          <h1
-            className="font-display text-[28px] font-semibold leading-tight text-ink mb-1"
-            style={{ fontVariationSettings: '"SOFT" 100, "WONK" 1, "opsz" 48' }}
-          >
-            Sign in.
+          <h1 className="text-[24px] font-semibold leading-tight text-ink mb-1 tracking-tight">
+            Sign in
           </h1>
           <p className="text-[13px] text-ink-faded mb-6 leading-snug">
             Sign in to save routes and access your library.
@@ -61,7 +50,7 @@ function LoginForm() {
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label htmlFor="email" className="label-mono-sm block mb-1.5">
+              <label htmlFor="email" className="text-[12px] text-ink-faded block mb-1.5">
                 Email
               </label>
               <input
@@ -71,12 +60,12 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-ink placeholder:text-ink-ghost outline-none transition-colors font-sans"
+                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-[14px] text-ink placeholder:text-ink-ghost outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="label-mono-sm block mb-1.5">
+              <label htmlFor="password" className="text-[12px] text-ink-faded block mb-1.5">
                 Password
               </label>
               <input
@@ -86,24 +75,24 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-ink placeholder:text-ink-ghost outline-none transition-colors font-sans"
+                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-[14px] text-ink placeholder:text-ink-ghost outline-none transition-colors"
               />
             </div>
 
             {error && (
-              <p className="text-[12px] text-vermillion-deep font-mono">— {error}</p>
+              <p className="text-[12px] text-vermillion-deep">{error}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-vermillion text-paper py-2.5 mt-2 label-mono-sm !text-paper hover:bg-vermillion-deep disabled:opacity-50 transition-colors"
+              className="w-full bg-vermillion text-white py-2.5 mt-2 text-[13px] font-medium hover:bg-vermillion-deep disabled:opacity-50 transition-colors"
             >
               {loading ? "Working…" : "Sign in"}
             </button>
           </form>
 
-          <p className="mt-6 text-center label-mono-sm">
+          <p className="mt-6 text-center text-[12px] text-ink-faded">
             You can browse and generate routes without an account.
           </p>
         </div>

@@ -31,60 +31,40 @@ export default function RouteCard({ route, rank, selected, onClick }: RouteCardP
   return (
     <button
       onClick={onClick}
-      className={`relative w-full text-left transition-all overflow-hidden border ${
+      className={`relative w-full text-left transition-colors overflow-hidden border ${
         selected
-          ? 'border-ink bg-paper-deep'
+          ? 'border-vermillion bg-vermillion/5'
           : 'border-hairline bg-paper hover:border-ink-faded'
       }`}
     >
-      {/* Route signature color stripe */}
       <span
         aria-hidden
         className="absolute left-0 top-0 bottom-0 w-[3px]"
         style={{ backgroundColor: route.color }}
       />
 
-      {/* Selected stamp */}
-      {selected && (
-        <span
-          aria-hidden
-          className="absolute top-2 right-2 label-mono-sm !text-vermillion"
-        >
-          ●
-        </span>
-      )}
-
-      <div className="pl-5 pr-4 py-4">
-        <div className="flex items-baseline gap-3 mb-1.5">
-          <span
-            className="font-display text-[28px] leading-none font-semibold text-ink tabular-nums"
-            style={{ fontVariationSettings: '"SOFT" 30, "opsz" 60' }}
-          >
-            {String(rank).padStart(2, '0')}
+      <div className="pl-5 pr-4 py-3.5">
+        <div className="flex items-baseline justify-between mb-1">
+          <span className="text-[12px] text-ink-faded">Route {rank}</span>
+          <span className="text-[13px] tabular-nums">
+            <span className="text-ink font-semibold">{route.score.overall}</span>
+            <span className="text-ink-ghost">/100</span>
           </span>
-          <span className="label-mono-sm">— Plate</span>
         </div>
 
         <h3
-          className="font-display text-[18px] leading-snug font-medium text-ink truncate mb-1"
-          style={{ fontVariationSettings: '"SOFT" 50, "opsz" 24' }}
+          className="text-[16px] leading-snug font-medium text-ink truncate mb-2"
           title={route.name}
         >
           {route.name}
         </h3>
 
-        <div className="flex items-baseline gap-3 mb-3">
-          <span className="coord-mono text-ink">
-            <span className="text-ink font-semibold">{route.score.overall}</span>
-            <span className="text-ink-ghost">/100</span>
-          </span>
-          <span className="label-mono-sm">match</span>
-        </div>
-
-        <div className="flex flex-wrap gap-x-4 gap-y-1 mb-3 coord-mono">
-          <span><span className="label-mono-sm mr-1">D</span>{formatDistance(route.distance)}</span>
-          <span><span className="label-mono-sm mr-1">T</span>{formatDuration(route.duration)}</span>
-          <span><span className="label-mono-sm mr-1">↑</span>{formatElevation(route.elevationGain)}</span>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 mb-2.5 text-[13px] tabular-nums text-ink-soft">
+          <span>{formatDistance(route.distance)}</span>
+          <span className="text-ink-ghost">·</span>
+          <span>{formatDuration(route.duration)}</span>
+          <span className="text-ink-ghost">·</span>
+          <span>↑ {formatElevation(route.elevationGain)}</span>
         </div>
 
         {route.tags.length > 0 && (
@@ -92,7 +72,7 @@ export default function RouteCard({ route, rank, selected, onClick }: RouteCardP
             {route.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-0.5 label-mono-sm border border-hairline-soft"
+                className="px-2 py-0.5 text-[11px] text-ink-faded border border-hairline-soft"
               >
                 {tag}
               </span>

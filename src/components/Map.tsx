@@ -43,7 +43,7 @@ export default function Map({
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/outdoors-v12',
+      style: 'mapbox://styles/mapbox/streets-v12',
       center,
       zoom,
       interactive,
@@ -79,7 +79,7 @@ export default function Map({
     }
 
     if (marker) {
-      markerRef.current = new mapboxgl.Marker({ color: '#3b82f6' })
+      markerRef.current = new mapboxgl.Marker({ color: '#1E3FFF' })
         .setLngLat(marker)
         .addTo(mapRef.current);
     }

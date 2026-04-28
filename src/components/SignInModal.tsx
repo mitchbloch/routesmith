@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import CompassRose from './ornament/CompassRose';
 
 interface SignInModalProps {
   open: boolean;
@@ -84,18 +83,12 @@ export default function SignInModal({
       onClick={onClose}
     >
       <div
-        className="field-card w-full max-w-sm relative ink-rise"
+        className="field-card w-full max-w-sm relative"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Corner accents */}
-        <span className="absolute top-2 left-2 w-2 h-2 border-l border-t border-ink" aria-hidden />
-        <span className="absolute top-2 right-2 w-2 h-2 border-r border-t border-ink" aria-hidden />
-        <span className="absolute bottom-2 left-2 w-2 h-2 border-l border-b border-ink" aria-hidden />
-        <span className="absolute bottom-2 right-2 w-2 h-2 border-r border-b border-ink" aria-hidden />
-
         <button
           onClick={onClose}
-          className="absolute top-3.5 right-3.5 text-ink-faded hover:text-ink transition-colors p-1"
+          className="absolute top-3 right-3 text-ink-faded hover:text-ink transition-colors p-1"
           aria-label="Close"
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
@@ -104,22 +97,20 @@ export default function SignInModal({
         </button>
 
         <div className="px-7 pt-7 pb-6">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-ink"><CompassRose size={16} /></span>
-            <span className="label-mono-sm">Routesmith</span>
+          <div className="mb-3">
+            <span className="text-[13px] font-semibold tracking-tight text-ink">Routesmith</span>
           </div>
 
-          <h2 className="font-display text-[26px] font-semibold leading-tight text-ink mb-1.5"
-              style={{ fontVariationSettings: '"SOFT" 100, "WONK" 0, "opsz" 36' }}>
+          <h2 className="text-[22px] font-semibold leading-tight text-ink mb-1.5 tracking-tight">
             {title === 'Sign in' && mode === 'signup' ? 'Create account' : title}
           </h2>
           <p className="text-[13px] text-ink-faded mb-5 leading-snug">{subtitle}</p>
 
-          <div className="flex border border-hairline mb-5 text-[11px] font-mono uppercase tracking-[0.18em]">
+          <div className="flex border border-hairline mb-5">
             <button
               type="button"
               onClick={() => { setMode('signin'); setError(null); setInfo(null); }}
-              className={`flex-1 py-2 transition-colors ${
+              className={`flex-1 py-2 text-[13px] font-medium transition-colors ${
                 mode === 'signin' ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
               }`}
             >
@@ -128,7 +119,7 @@ export default function SignInModal({
             <button
               type="button"
               onClick={() => { setMode('signup'); setError(null); setInfo(null); }}
-              className={`flex-1 py-2 transition-colors border-l border-hairline ${
+              className={`flex-1 py-2 text-[13px] font-medium transition-colors border-l border-hairline ${
                 mode === 'signup' ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
               }`}
             >
@@ -138,7 +129,7 @@ export default function SignInModal({
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="signin-email" className="label-mono-sm block mb-1.5">
+              <label htmlFor="signin-email" className="text-[12px] text-ink-faded block mb-1.5">
                 Email
               </label>
               <input
@@ -148,12 +139,12 @@ export default function SignInModal({
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-ink placeholder:text-ink-ghost outline-none transition-colors font-sans"
+                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-[14px] text-ink placeholder:text-ink-ghost outline-none transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="signin-password" className="label-mono-sm block mb-1.5">
+              <label htmlFor="signin-password" className="text-[12px] text-ink-faded block mb-1.5">
                 Password
               </label>
               <input
@@ -164,21 +155,21 @@ export default function SignInModal({
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
-                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-ink placeholder:text-ink-ghost outline-none transition-colors font-sans"
+                className="w-full bg-transparent border-b border-hairline focus:border-ink py-1.5 text-[14px] text-ink placeholder:text-ink-ghost outline-none transition-colors"
               />
             </div>
 
             {error && (
-              <p className="text-[12px] text-vermillion-deep font-mono">— {error}</p>
+              <p className="text-[12px] text-vermillion-deep">{error}</p>
             )}
             {info && (
-              <p className="text-[12px] text-forest font-mono">— {info}</p>
+              <p className="text-[12px] text-forest">{info}</p>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-vermillion text-paper py-2.5 mt-2 label-mono-sm !text-paper hover:bg-vermillion-deep disabled:opacity-50 transition-colors"
+              className="w-full bg-vermillion text-white py-2.5 mt-2 text-[13px] font-medium hover:bg-vermillion-deep disabled:opacity-50 transition-colors"
             >
               {loading ? 'Working…' : mode === 'signin' ? 'Sign in' : 'Create account'}
             </button>

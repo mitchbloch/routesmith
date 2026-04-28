@@ -24,6 +24,9 @@ export default function DistanceSlider({
   onChangeUnit,
 }: DistanceSliderProps) {
   const unitLabel = unit === 'miles' ? 'mi' : 'km';
+  const range = max - min;
+  const minPct = ((valueMin - min) / range) * 100;
+  const maxPct = ((valueMax - min) / range) * 100;
 
   return (
     <div className="space-y-7">
@@ -32,7 +35,7 @@ export default function DistanceSlider({
         <div className="inline-flex border border-hairline">
           <button
             onClick={() => onChangeUnit('miles')}
-            className={`label-mono-sm px-4 py-1.5 transition-colors ${
+            className={`text-[13px] font-medium px-4 py-1.5 transition-colors ${
               unit === 'miles' ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
             }`}
           >
@@ -40,7 +43,7 @@ export default function DistanceSlider({
           </button>
           <button
             onClick={() => onChangeUnit('km')}
-            className={`label-mono-sm px-4 py-1.5 transition-colors border-l border-hairline ${
+            className={`text-[13px] font-medium px-4 py-1.5 transition-colors border-l border-hairline ${
               unit === 'km' ? 'bg-ink text-paper' : 'text-ink-faded hover:bg-paper-deep'
             }`}
           >
@@ -49,32 +52,34 @@ export default function DistanceSlider({
         </div>
       </div>
 
-      {/* Display range — large numerals */}
-      <div className="text-center py-2 border-y border-hairline">
-        <span className="label-mono-sm block mb-1">Range · target distance</span>
-        <span
-          className="font-display text-[56px] sm:text-[64px] font-semibold text-ink leading-none tracking-tight"
-          style={{ fontVariationSettings: '"SOFT" 30, "opsz" 144' }}
-        >
-          {valueMin}
-        </span>
-        <span className="font-display text-[36px] text-ink-ghost mx-2">—</span>
-        <span
-          className="font-display text-[56px] sm:text-[64px] font-semibold text-ink leading-none tracking-tight"
-          style={{ fontVariationSettings: '"SOFT" 30, "opsz" 144' }}
-        >
-          {valueMax}
-        </span>
-        <span className="label-mono ml-2">{unitLabel}</span>
+      {/* Display range */}
+      <div className="text-center py-3 border-y border-hairline">
+        <p className="text-[12px] text-ink-faded mb-2">Target distance</p>
+        <div className="flex items-baseline justify-center gap-2 tabular-nums">
+          <span className="text-[52px] sm:text-[60px] font-semibold text-ink leading-none tracking-tight">
+            {valueMin}
+          </span>
+          <span className="text-[28px] text-ink-ghost">–</span>
+          <span className="text-[52px] sm:text-[60px] font-semibold text-ink leading-none tracking-tight">
+            {valueMax}
+          </span>
+          <span className="text-[14px] text-ink-faded ml-1">{unitLabel}</span>
+        </div>
       </div>
 
-      {/* Sliders */}
-      <div className="space-y-5 px-1">
-        <div>
-          <div className="flex justify-between items-baseline mb-2">
-            <span className="label-mono-sm">Minimum</span>
-            <span className="coord-mono">{valueMin.toFixed(1)} {unitLabel}</span>
-          </div>
+      {/* Dual-handle slider */}
+      <div className="px-2 pb-2">
+        <div className="relative h-5 flex items-center">
+          {/* Track */}
+          <div className="absolute left-0 right-0 h-[1px] bg-hairline" />
+          {/* Active fill */}
+          <div
+            className="absolute h-[2px] bg-vermillion"
+            style={{
+              left: `${minPct}%`,
+              right: `${100 - maxPct}%`,
+            }}
+          />
           <input
             type="range"
             min={min}
@@ -85,14 +90,9 @@ export default function DistanceSlider({
               const v = Number(e.target.value);
               onChangeMin(Math.min(v, valueMax - 0.5));
             }}
-            className="field-range"
+            className="dual-range"
+            aria-label="Minimum distance"
           />
-        </div>
-        <div>
-          <div className="flex justify-between items-baseline mb-2">
-            <span className="label-mono-sm">Maximum</span>
-            <span className="coord-mono">{valueMax.toFixed(1)} {unitLabel}</span>
-          </div>
           <input
             type="range"
             min={min}
@@ -103,8 +103,13 @@ export default function DistanceSlider({
               const v = Number(e.target.value);
               onChangeMax(Math.max(v, valueMin + 0.5));
             }}
-            className="field-range"
+            className="dual-range"
+            aria-label="Maximum distance"
           />
+        </div>
+        <div className="flex justify-between mt-2 text-[12px] tabular-nums text-ink-faded">
+          <span>{min} {unitLabel}</span>
+          <span>{max} {unitLabel}</span>
         </div>
       </div>
     </div>

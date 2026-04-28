@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { Fraunces, JetBrains_Mono } from "next/font/google";
+import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "mapbox-gl/dist/mapbox-gl.css";
 
-const fraunces = Fraunces({
-  variable: "--font-fraunces",
+const plexSans = IBM_Plex_Sans({
+  variable: "--font-plex-sans",
   subsets: ["latin"],
-  axes: ["SOFT", "WONK", "opsz"],
+  weight: ["300", "400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -18,13 +18,13 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Routesmith — A Fieldbook of Routes",
+  title: "Routesmith",
   description:
-    "A fieldbook for runners, walkers, and cyclists. Plot routes by terrain, scenery, and distance.",
+    "Plot running, walking, and cycling routes by terrain, scenery, and distance.",
   openGraph: {
-    title: "Routesmith — A Fieldbook of Routes",
+    title: "Routesmith",
     description:
-      "A fieldbook for runners, walkers, and cyclists. Plot routes by terrain, scenery, and distance.",
+      "Plot running, walking, and cycling routes by terrain, scenery, and distance.",
     type: "website",
     siteName: "Routesmith",
   },
@@ -42,10 +42,10 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#1B1A17" />
+        <meta name="theme-color" content="#FAFAF7" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
-      <body className={`${fraunces.variable} ${jetbrainsMono.variable} antialiased`}>
+      <body className={`${plexSans.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
     </html>
