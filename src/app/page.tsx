@@ -76,7 +76,7 @@ export default function Home() {
 
       {/* Start point card — floats bottom-left when chosen */}
       {location && (
-        <div className="absolute bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 sm:left-6 sm:right-auto z-10 sm:w-[400px] ink-rise">
+        <div className="absolute bottom-[calc(2rem+env(safe-area-inset-bottom))] left-4 right-4 sm:left-6 sm:right-auto z-10 sm:w-[400px] ink-rise">
           <div className="field-card">
             <div className="px-4 pt-3 pb-3">
               <p className="text-[12px] font-medium text-ink-faded mb-1">Start</p>
