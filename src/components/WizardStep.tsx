@@ -26,7 +26,7 @@ export default function WizardStep({
   const pct = Math.round((step / totalSteps) * 100);
 
   return (
-    <div className="min-h-screen bg-paper flex flex-col pt-12">
+    <div className="min-h-dvh bg-paper flex flex-col pt-12">
       {/* Progress strip */}
       <div className="px-5 sm:px-8 pt-6 pb-2">
         <div className="max-w-2xl mx-auto">

@@ -11,7 +11,7 @@ export default function MapGroupLayout({ children }: { children: React.ReactNode
   const displayed = activeRoute ? [activeRoute] : routes;
 
   return (
-    <div className="h-screen flex flex-col bg-paper">
+    <div className="h-dvh flex flex-col bg-paper">
       <Nav />
       <div className="flex-1 flex flex-col lg:flex-row pt-12">
         <div className="h-[35vh] sm:h-[40vh] lg:h-full lg:flex-1 relative">

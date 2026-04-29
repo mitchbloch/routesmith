@@ -37,7 +37,7 @@ export default function Home() {
 
   if (geo.loading) {
     return (
-      <div className="h-screen w-screen relative bg-paper">
+      <div className="h-dvh w-screen relative bg-paper">
         <Nav />
         <div className="w-full h-full flex items-center justify-center">
           <div className="text-center">
@@ -56,7 +56,7 @@ export default function Home() {
   const proximity: [number, number] = mapCenter;
 
   return (
-    <div className="h-screen w-screen relative bg-paper">
+    <div className="h-dvh w-screen relative bg-paper">
       <Nav />
       <Map
         onLocationSelect={(lat, lng) => handleLocationSelect(lat, lng)}
