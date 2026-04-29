@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import "mapbox-gl/dist/mapbox-gl.css";
@@ -17,10 +17,27 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  themeColor: "#FAFAF7",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
 export const metadata: Metadata = {
   title: "Routesmith",
   description:
     "Plot running, walking, and cycling routes by terrain, scenery, and distance.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Routesmith",
+  },
+  icons: {
+    icon: "/icons/icon-192.png",
+    apple: "/apple-touch-icon.png",
+  },
   openGraph: {
     title: "Routesmith",
     description:
@@ -40,11 +57,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#FAFAF7" />
-        <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-      </head>
       <body className={`${plexSans.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
