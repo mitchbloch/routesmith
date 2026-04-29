@@ -22,7 +22,7 @@ export default function MapGroupLayout({ children }: { children: React.ReactNode
             center={center ?? undefined}
           />
         </div>
-        <div className="flex-1 lg:w-[420px] lg:flex-none overflow-y-auto lg:border-l lg:border-hairline">
+        <div className="flex-1 lg:w-[420px] lg:flex-none overflow-y-auto lg:border-l lg:border-hairline pb-[env(safe-area-inset-bottom)]">
           {children}
         </div>
       </div>

@@ -63,7 +63,7 @@ export default function WizardStep({
       </div>
 
       {/* Navigation */}
-      <div className="px-5 sm:px-8 py-3.5 border-t border-hairline bg-paper">
+      <div className="px-5 sm:px-8 pt-3.5 pb-[calc(0.875rem+env(safe-area-inset-bottom))] border-t border-hairline bg-paper">
         <div className="max-w-2xl mx-auto flex gap-2">
           {onBack && (
             <button
